@@ -1,3 +1,9 @@
 # Java project 2021. Backend
 
-Я здесь чисто по фану - поглумиться над слабым....
+* Необходим установленный докер.
+* Сборка и запуск проекта:
+```
+docker-compose build
+docker-compose up -d
+```
+* Ресурсы по адрессу: http://localhost:8080/api/*
