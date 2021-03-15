@@ -3,7 +3,7 @@
 * Необходим установленный докер.
 * Сборка и запуск проекта:
 ```
-docker-compose build
-docker-compose up -d
+docker compose build
+docker compose up -d
 ```
 * Ресурсы по адрессу: http://localhost:8080/api/*
