@@ -28,10 +28,17 @@ public class PostsApiController implements PostsApi {
 
     private final HttpServletRequest request;
 
+    private final PostsDAO postsDAO;
+
     @org.springframework.beans.factory.annotation.Autowired
-    public PostsApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+    public PostsApiController(ObjectMapper objectMapper, PostsDAO postsDAO, HttpServletRequest request) {
         this.objectMapper = objectMapper;
+        this.postsDAO = postsDAO;
         this.request = request;
+    }
+
+    public ResponseEntity<Post> getAllPosts() {
+        return new ResponseEntity<Post>(postsDAO.getPosts(), HttpStatus.OK);
     }
 
     public ResponseEntity<Void> createPost(@ApiParam(value = "" ,required=true )  @Valid @RequestBody Post body) {
@@ -42,11 +49,6 @@ public class PostsApiController implements PostsApi {
     public ResponseEntity<Void> deletePost(@ApiParam(value = "",required=true) @PathVariable("id") Long id) {
         String accept = request.getHeader("Accept");
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    @Autowired
-    public ResponseEntity<Post> getAllPosts(PostsDAO postDAO) {
-        return new ResponseEntity<Post>(postDAO.getPosts(), HttpStatus.OK);
     }
 
     public ResponseEntity<Post> getPostById(@ApiParam(value = "",required=true) @PathVariable("id") Integer id) {

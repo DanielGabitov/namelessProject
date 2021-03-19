@@ -50,7 +50,7 @@ public interface PostsApi {
     @RequestMapping(value = "/posts",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<Post> getAllPosts(PostsDAO postDAO);
+    ResponseEntity<Post> getAllPosts();
 
 
     @ApiOperation(value = "", nickname = "getPostById", notes = "", response = Post.class, tags={ "posts", })
@@ -71,5 +71,4 @@ public interface PostsApi {
         consumes = { "application/json" },
         method = RequestMethod.PUT)
     ResponseEntity<Void> updatePosts(@ApiParam(value = "",required=true) @PathVariable("id") Long id,@ApiParam(value = "" ,required=true )  @Valid @RequestBody Post body);
-
 }
