@@ -1,6 +1,20 @@
 version: "3.7"
 services:
+  database:
+    build: ./db
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-HSE}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - 5432:5432
+
   appimage:
     build: .
     ports:
-    - 8080:8080
+      - 8080:8080
+
+volumes:
+  postgres:
