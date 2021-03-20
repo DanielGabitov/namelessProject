@@ -1,8 +1,9 @@
 version: "3.7"
 services:
-  database:
+  p:
     build: ./db
     container_name: postgres
+    hostname: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-HSE}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
@@ -11,8 +12,12 @@ services:
     ports:
       - 5432:5432
 
-  appimage:
+  app:
     build: .
+    depends_on:
+      - database
+    environment:
+      WAIT_HOSTS: postgres:5432
     ports:
       - 8080:8080
 

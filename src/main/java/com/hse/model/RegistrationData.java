@@ -1,44 +1,54 @@
 package com.hse.model;
 
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.Objects;
-
-/**
- * RegistrationData
- */
-@Validated
-
-
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 public class RegistrationData   {
-  @JsonProperty("id")
-  private Long id = null;
-
   @JsonProperty("UserName")
   private String userName = null;
 
-  public RegistrationData id(Long id) {
-    this.id = id;
-    return this;
-  }
-
   /**
-   * Get id
-   * @return id
-  **/
-  @ApiModelProperty(value = "")
+   * Gets or Sets userType
+   */
+  public enum UserTypeEnum {
+    USER("User"),
 
+    CONTENT_MAKER("Content Maker"),
 
-  public Long getId() {
-    return id;
+    HOST("Host");
+
+    private String value;
+
+    UserTypeEnum(String value) {
+      this.value = value;
+    }
+
+    @Override
+    @JsonValue
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static UserTypeEnum fromValue(String text) {
+      for (UserTypeEnum b : UserTypeEnum.values()) {
+        if (String.valueOf(b.value).equals(text)) {
+          return b;
+        }
+      }
+      return null;
+    }
   }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+  @JsonProperty("UserType")
+  private UserTypeEnum userType = null;
 
   public RegistrationData userName(String userName) {
     this.userName = userName;
@@ -48,7 +58,7 @@ public class RegistrationData   {
   /**
    * Get userName
    * @return userName
-  **/
+   **/
   @ApiModelProperty(value = "")
 
 
@@ -58,6 +68,26 @@ public class RegistrationData   {
 
   public void setUserName(String userName) {
     this.userName = userName;
+  }
+
+  public RegistrationData userType(UserTypeEnum userType) {
+    this.userType = userType;
+    return this;
+  }
+
+  /**
+   * Get userType
+   * @return userType
+   **/
+  @ApiModelProperty(value = "")
+
+
+  public UserTypeEnum getUserType() {
+    return userType;
+  }
+
+  public void setUserType(UserTypeEnum userType) {
+    this.userType = userType;
   }
 
 
@@ -70,22 +100,22 @@ public class RegistrationData   {
       return false;
     }
     RegistrationData registrationData = (RegistrationData) o;
-    return Objects.equals(this.id, registrationData.id) &&
-        Objects.equals(this.userName, registrationData.userName);
+    return Objects.equals(this.userName, registrationData.userName) &&
+            Objects.equals(this.userType, registrationData.userType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, userName);
+    return Objects.hash(userName, userType);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class RegistrationData {\n");
-    
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+
     sb.append("    userName: ").append(toIndentedString(userName)).append("\n");
+    sb.append("    userType: ").append(toIndentedString(userType)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -101,4 +131,3 @@ public class RegistrationData   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-
