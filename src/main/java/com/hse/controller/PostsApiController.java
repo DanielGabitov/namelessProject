@@ -1,14 +1,11 @@
 package com.hse.controller;
 
-import com.hse.DAO.PostMapper;
-import com.hse.DAO.PostsDAO;
-import com.hse.model.ArrayOfIds;
+import com.hse.DAO.UserDAO;
 import com.hse.model.Post;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.List;
 
 
 @RestController
@@ -28,17 +24,17 @@ public class PostsApiController implements PostsApi {
 
     private final HttpServletRequest request;
 
-    private final PostsDAO postsDAO;
+    private final UserDAO userDAO;
 
     @org.springframework.beans.factory.annotation.Autowired
-    public PostsApiController(ObjectMapper objectMapper, PostsDAO postsDAO, HttpServletRequest request) {
+    public PostsApiController(ObjectMapper objectMapper, UserDAO userDAO, HttpServletRequest request) {
         this.objectMapper = objectMapper;
-        this.postsDAO = postsDAO;
+        this.userDAO = userDAO;
         this.request = request;
     }
 
     public ResponseEntity<Post> getAllPosts() {
-        return new ResponseEntity<Post>(postsDAO.getPosts(), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<Void> createPost(@ApiParam(value = "" ,required=true )  @Valid @RequestBody Post body) {

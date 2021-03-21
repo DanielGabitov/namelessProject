@@ -24,7 +24,7 @@ import java.util.List;
 public interface UsersApi {
 
     @ApiOperation(value = "", nickname = "createUser", notes = "New user has registrated.", tags={ "users", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful operation"),
         @ApiResponse(code = 404, message = "Some error idk"),
         @ApiResponse(code = 405, message = "Invalid input") })
@@ -44,14 +44,14 @@ public interface UsersApi {
     ResponseEntity<Void> deleteUser(@ApiParam(value = "ID of a user",required=true) @PathVariable("userId") Long userId);
 
 
-    @ApiOperation(value = "", nickname = "getUserData", notes = "Get all information about user with given userId.", response = UserData.class, tags={ "users", })
+    @ApiOperation(value = "", nickname = "getUserData", notes = "Get all information about user with given userId.", response = User.class, tags={ "users", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "successful operation", response = UserData.class),
+        @ApiResponse(code = 200, message = "successful operation", response = User.class),
         @ApiResponse(code = 404, message = "User not found") })
     @RequestMapping(value = "/users/{userId}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<UserData> getUserData(@ApiParam(value = "ID of a user",required=true) @PathVariable("userId") Long userId);
+    ResponseEntity<User> getUserData(@ApiParam(value = "ID of a user",required=true) @PathVariable("userId") int userId);
 
 
     @ApiOperation(value = "", nickname = "getUserEvents", notes = "Get all user's events.", response = ArrayOfIds.class, tags={ "users", })

@@ -15,28 +15,29 @@ import java.util.Objects;
 
 
 
-public class UserData   {
+public class User {
   @JsonProperty("id")
-  private Long id;
+  private int id;
 
-  public UserData(Long id, UserTypeEnum userType, String userName, String fullUserName) {
+  public User(int id, UserTypeEnum userType, String userName) {
     this.id = id;
     this.userType = userType;
     this.userName = userName;
-    this.fullUserName = fullUserName;
   }
+
+  public User(){};
 
   /**
    * Gets or Sets userType
    */
   public enum UserTypeEnum {
     USER("User"),
-    
-    CONTENT_MAKER("Content Maker"),
-    
+
+    CONTENT_MAKER("ContentMaker"),
+
     HOST("Host");
 
-    private String value;
+    private final String value;
 
     private UserTypeEnum(String value) {
       this.value = value;
@@ -65,10 +66,7 @@ public class UserData   {
   @JsonProperty("userName")
   private String userName = null;
 
-  @JsonProperty("fullUserName")
-  private String fullUserName = null;
-
-  public UserData id(Long id) {
+  public User id(int id) {
     this.id = id;
     return this;
   }
@@ -80,15 +78,15 @@ public class UserData   {
   @ApiModelProperty(value = "")
 
 
-  public Long getId() {
+  public int getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(int id) {
     this.id = id;
   }
 
-  public UserData userType(UserTypeEnum userType) {
+  public User userType(UserTypeEnum userType) {
     this.userType = userType;
     return this;
   }
@@ -108,7 +106,7 @@ public class UserData   {
     this.userType = userType;
   }
 
-  public UserData userName(String userName) {
+  public User userName(String userName) {
     this.userName = userName;
     return this;
   }
@@ -128,26 +126,12 @@ public class UserData   {
     this.userName = userName;
   }
 
-  public UserData fullUserName(String fullUserName) {
-    this.fullUserName = fullUserName;
-    return this;
-  }
 
   /**
    * Get fullUserName
    * @return fullUserName
   **/
   @ApiModelProperty(value = "")
-
-
-  public String getFullUserName() {
-    return fullUserName;
-  }
-
-  public void setFullUserName(String fullUserName) {
-    this.fullUserName = fullUserName;
-  }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -157,16 +141,15 @@ public class UserData   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    UserData userData = (UserData) o;
+    User userData = (User) o;
     return Objects.equals(this.id, userData.id) &&
         Objects.equals(this.userType, userData.userType) &&
-        Objects.equals(this.userName, userData.userName) &&
-        Objects.equals(this.fullUserName, userData.fullUserName);
+        Objects.equals(this.userName, userData.userName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, userType, userName, fullUserName);
+    return Objects.hash(id, userType, userName);
   }
 
   @Override
@@ -177,7 +160,6 @@ public class UserData   {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    userType: ").append(toIndentedString(userType)).append("\n");
     sb.append("    userName: ").append(toIndentedString(userName)).append("\n");
-    sb.append("    fullUserName: ").append(toIndentedString(fullUserName)).append("\n");
     sb.append("}");
     return sb.toString();
   }

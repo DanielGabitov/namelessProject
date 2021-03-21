@@ -2,6 +2,6 @@ create database hse;
 \c hse;
 CREATE TABLE USERS(
       Id int,
-      UserType int,
-      UserName varchar(20)
+      UserType varchar(20),
+      UserName varchar(30)
 );

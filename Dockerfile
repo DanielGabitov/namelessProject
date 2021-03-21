@@ -11,5 +11,10 @@ RUN mvn -f /home/app/pom.xml clean package
 #
 FROM openjdk:11-jre-slim
 COPY --from=build /home/app/target/thinker.io-1.0.0.jar /usr/local/lib/demo.jar
+
+# Add wait for it
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.8.0/wait /wait
+RUN chmod +x /wait
+CMD /wait
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/usr/local/lib/demo.jar"]

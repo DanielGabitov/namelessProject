@@ -3,6 +3,7 @@ services:
   database:
     build: ./db
     container_name: postgres
+    hostname: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-HSE}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
@@ -11,8 +12,10 @@ services:
     ports:
       - 5432:5432
 
-  appimage:
+  app:
     build: .
+    depends_on:
+      - database
     ports:
       - 8080:8080
 

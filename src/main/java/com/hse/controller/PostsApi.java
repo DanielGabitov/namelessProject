@@ -5,8 +5,6 @@
  */
 package com.hse.controller;
 
-import com.hse.DAO.PostMapper;
-import com.hse.DAO.PostsDAO;
 import com.hse.model.ArrayOfIds;
 import com.hse.model.Post;
 import io.swagger.annotations.*;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
-import java.util.List;
 
 
 @Validated
