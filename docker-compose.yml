@@ -1,6 +1,6 @@
 version: "3.7"
 services:
-  p:
+  database:
     build: ./db
     container_name: postgres
     hostname: postgres
@@ -16,8 +16,6 @@ services:
     build: .
     depends_on:
       - database
-    environment:
-      WAIT_HOSTS: postgres:5432
     ports:
       - 8080:8080
 
