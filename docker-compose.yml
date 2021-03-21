@@ -1,23 +1,31 @@
 version: "3.7"
 services:
   database:
-    build: ./db
+    image: postgres
     container_name: postgres
-    hostname: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-HSE}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
-    volumes:
-      - postgres:/data/postgres
     ports:
       - 5432:5432
 
-  app:
+  appimage:
     build: .
-    depends_on:
-      - database
     ports:
       - 8080:8080
 
+  flyway:
+    image: flyway/flyway:latest
+    depends_on:
+      - database
+    container_name: my-flyway
+    environment:
+      - FLYWAY_USER=HSE
+      - FLYWAY_PASSWORD=password
+      - FLYWAY_URL=jdbc:postgresql://database:5432/postgres
+      - FLYWAY_GROUP=true
+    volumes:
+      - ./src/main/resources/db/migration:/flyway/sql
+    command: -locations=filesystem:/flyway/sql -connectRetries=60 migrate
 volumes:
   postgres:
