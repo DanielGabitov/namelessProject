@@ -26,7 +26,6 @@ public class EventController {
 
     @GetMapping(value = "/{id}", produces = {"application/json"})
     public ResponseEntity<Event> getEventById(@PathVariable("id") int eventId){
-        System.out.println(eventId);
         Event event = eventDAO.getEvent(eventId);
         return new ResponseEntity<>(event, HttpStatus.OK);
     }

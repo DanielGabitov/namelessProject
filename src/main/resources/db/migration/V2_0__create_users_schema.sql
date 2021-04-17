@@ -1,5 +1,5 @@
 CREATE TABLE users(
-   id int,
-   name varchar(40),
-   rating real
+    id bigint,
+    name varchar(40),
+    rating double precision
 );
