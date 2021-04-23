@@ -15,9 +15,6 @@ public class EventDAO {
 
     private final RowMapper<Event> eventMapper = new BeanPropertyRowMapper<>(Event.class);
 
-    private final AtomicLong counterOfEvents = new AtomicLong();
-
-
     @Autowired
     public EventDAO(JdbcTemplate jdbcTemplate){
         this.jdbcTemplate = jdbcTemplate;
@@ -31,7 +28,7 @@ public class EventDAO {
     }
 
     public void saveEvent(Event event){
-        jdbcTemplate.update("INSERT INTO events VALUES (?, ?, ?, ?, ?)"
-                , counterOfEvents.incrementAndGet(), event.getName(), event.getDescription(), event.getDate(), event.getOrganizerId());
+        jdbcTemplate.update("INSERT INTO events (name, description, date, organizerid) VALUES (?, ?, ?, ?)",
+                event.getName(), event.getDescription(), event.getDate(), event.getOrganizerId());
     }
 }
