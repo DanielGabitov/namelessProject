@@ -15,8 +15,6 @@ public class UserDAO {
 
     private final RowMapper<User> userMapper = new BeanPropertyRowMapper<>(User.class);
 
-    private final AtomicLong counterOfUsers = new AtomicLong();
-
     @Autowired
     public UserDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -30,6 +28,6 @@ public class UserDAO {
     }
 
     public void saveUser(User user) {
-        jdbcTemplate.update("INSERT INTO users VALUES (?, ?, ?)", counterOfUsers.incrementAndGet(), user.getName(), user.getRating());
+        jdbcTemplate.update("INSERT INTO users (name, rating) VALUES (?, ?)", user.getName(), user.getRating());
     }
 }

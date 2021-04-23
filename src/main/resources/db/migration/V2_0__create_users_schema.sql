@@ -1,5 +1,5 @@
 CREATE TABLE users(
-    id bigint,
+    id BIGSERIAL NOT NULL PRIMARY KEY,
     name varchar(40),
     rating double precision
 );
