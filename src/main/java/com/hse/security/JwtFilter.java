@@ -28,8 +28,12 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws IOException {
         try {
-            if (jwtProvider.validateToken(getTokenFromRequest(httpServletRequest))) {
-                Claims claims = getClaimsFromRequest(httpServletRequest);
+            String token = getTokenFromRequest(httpServletRequest);
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.replace("Bearer ", "");
+            }
+            if (jwtProvider.validateToken(token)) {
+                Claims claims = getClaimsFromRequest(token);
                 if (claims.get("authorities") != null) {
                     setUpSpringAuthentication(claims);
                 } else {
@@ -49,21 +53,18 @@ public class JwtFilter extends OncePerRequestFilter {
         return request.getHeader("Authorization");
     }
 
-    private Claims getClaimsFromRequest(HttpServletRequest request) {
+    private Claims getClaimsFromRequest(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(jwtProvider.getKey())
                 .build()
-                .parseClaimsJws(getTokenFromRequest(request))
+                .parseClaimsJws(token)
                 .getBody();
     }
 
     private void setUpSpringAuthentication(Claims claims) {
-        @SuppressWarnings("unchecked")
-        List<String> authorities = (List<String>) claims.get("authorities");
-
+        List<String> authorities = List.of("ROLE_USER");
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(claims.getSubject(), null,
                 authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
         SecurityContextHolder.getContext().setAuthentication(auth);
-
     }
 }

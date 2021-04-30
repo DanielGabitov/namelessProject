@@ -7,8 +7,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 @Component
 public class UserDAO {
     private final JdbcTemplate jdbcTemplate;
@@ -35,6 +33,7 @@ public class UserDAO {
     }
 
     public void saveUser(User user) {
-        jdbcTemplate.update("INSERT INTO users (name, rating) VALUES (?, ?)", user.getName(), user.getRating());
+        jdbcTemplate.update("INSERT INTO users (name, login, password, rating) VALUES (?, ?, ?, ?)", user.getName(), user.getLogin(),
+                user.getPassword(), user.getRating());
     }
 }
