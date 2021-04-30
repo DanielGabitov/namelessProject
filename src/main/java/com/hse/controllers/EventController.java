@@ -27,6 +27,7 @@ public class EventController {
 
     @PostMapping(value = "/load", consumes = {"application/json"})
     public ResponseEntity<String> createEvent(@RequestBody Event event){
+        System.out.println(event.toString());
         eventDAO.saveEvent(event);
         return ResponseEntity.ok("Event has been added.");
     }
