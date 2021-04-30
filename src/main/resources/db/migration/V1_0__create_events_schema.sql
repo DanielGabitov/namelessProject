@@ -1,7 +1,8 @@
-CREATE TABLE events(
-    id int,
-    name varchar(40),
+CREATE TABLE events
+(
+    id          int,
+    name        varchar(40),
     description text,
-    date timestamp,
+    date        timestamp,
     organizerId int
 );

@@ -14,18 +14,18 @@ public class EventController {
     private final EventDAO eventDAO;
 
     @Autowired
-    public EventController(EventDAO eventDAO){
+    public EventController(EventDAO eventDAO) {
         this.eventDAO = eventDAO;
     }
 
     @PostMapping(value = "/load", consumes = {"application/json"})
-    public ResponseEntity<String> createEvent(@RequestBody Event event){
+    public ResponseEntity<String> createEvent(@RequestBody Event event) {
         eventDAO.saveEvent(event);
         return ResponseEntity.ok("Event has been added.");
     }
 
     @GetMapping(value = "/{id}", produces = {"application/json"})
-    public ResponseEntity<Event> getEventById(@PathVariable("id") int eventId){
+    public ResponseEntity<Event> getEventById(@PathVariable("id") int eventId) {
         Event event = eventDAO.getEvent(eventId);
         return new ResponseEntity<>(event, HttpStatus.OK);
     }
