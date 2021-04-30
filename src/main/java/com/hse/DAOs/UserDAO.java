@@ -27,6 +27,13 @@ public class UserDAO {
                 .orElseThrow(() -> new IllegalArgumentException("Could not find user with given ID in database."));
     }
 
+    public User getUserByLogin(String login) throws IllegalArgumentException {
+        return jdbcTemplate.query("SELECT * FROM users WHERE login=?", new Object[]{login}, userMapper)
+                .stream()
+                .findAny()
+                .orElse(null);
+    }
+
     public void saveUser(User user) {
         jdbcTemplate.update("INSERT INTO users (name, rating) VALUES (?, ?)", user.getName(), user.getRating());
     }
