@@ -62,7 +62,8 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private void setUpSpringAuthentication(Claims claims) {
-        List<String> authorities = List.of("ROLE_USER");
+        @SuppressWarnings("unchecked")
+        List<String> authorities = (List) claims.get("authorities");
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(claims.getSubject(), null,
                 authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
         SecurityContextHolder.getContext().setAuthentication(auth);

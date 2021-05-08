@@ -11,7 +11,8 @@ public class Event {
     private Timestamp date;
     private int organizerId;
 
-    public Event() {}
+    public Event() {
+    }
 
     public Event(String name, String description, Timestamp date, int organizerId) {
         this.name = name;

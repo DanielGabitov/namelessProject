@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
 import java.security.Key;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,8 @@ public class JwtProvider {
                 .claim("authorities", grantedAuthorities.stream()
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toList()))
+                .setExpiration(new Date(System.currentTimeMillis() + 600_000))
+                .signWith(key)
                 .compact();
     }
 

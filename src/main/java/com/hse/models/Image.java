@@ -16,7 +16,8 @@ public class Image {
         this.data = data;
     }
 
-    public Image() {}
+    public Image() {
+    }
 
     public int getId() {
         return id;

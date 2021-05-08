@@ -1,6 +1,5 @@
-        package com.hse.DAOs;
+package com.hse.DAOs;
 
-import com.hse.models.Event;
 import com.hse.models.Image;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -9,11 +8,10 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-        @Component
+@Component
 public class ImageDAO {
 
     private final JdbcTemplate jdbcTemplate;
@@ -21,7 +19,7 @@ public class ImageDAO {
     private final RowMapper<Image> imageMapper = new BeanPropertyRowMapper<>(Image.class);
 
     @Autowired
-    public ImageDAO(JdbcTemplate jdbcTemplate){
+    public ImageDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

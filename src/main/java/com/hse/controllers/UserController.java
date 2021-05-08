@@ -14,18 +14,18 @@ public class UserController {
     private final UserDAO userDAO;
 
     @Autowired
-    public UserController(UserDAO userDAO){
+    public UserController(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
 
     @PostMapping(value = "/load", consumes = {"application/json"})
-    public ResponseEntity<String> createUser(@RequestBody User user){
+    public ResponseEntity<String> createUser(@RequestBody User user) {
         userDAO.saveUser(user);
         return ResponseEntity.ok("User has been added.");
     }
 
     @GetMapping(value = "/{id}", produces = {"application/json"})
-    public ResponseEntity<User> getUserById(@PathVariable("id") Long userId){
+    public ResponseEntity<User> getUserById(@PathVariable("id") Long userId) {
         User user = userDAO.getUser(userId);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
