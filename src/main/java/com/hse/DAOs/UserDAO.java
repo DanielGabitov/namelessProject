@@ -7,8 +7,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 @Component
 public class UserDAO {
     private final JdbcTemplate jdbcTemplate;
@@ -27,7 +25,15 @@ public class UserDAO {
                 .orElseThrow(() -> new IllegalArgumentException("Could not find user with given ID in database."));
     }
 
+    public User getUserByLogin(String login) throws IllegalArgumentException {
+        return jdbcTemplate.query("SELECT * FROM users WHERE login=?", new Object[]{login}, userMapper)
+                .stream()
+                .findAny()
+                .orElse(null);
+    }
+
     public void saveUser(User user) {
-        jdbcTemplate.update("INSERT INTO users (name, rating) VALUES (?, ?)", user.getName(), user.getRating());
+        jdbcTemplate.update("INSERT INTO users (name, login, password, rating) VALUES (?, ?, ?, ?)", user.getName(), user.getLogin(),
+                user.getPassword(), user.getRating());
     }
 }

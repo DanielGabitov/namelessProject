@@ -6,10 +6,6 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class EventDAO {
@@ -18,24 +14,25 @@ public class EventDAO {
     private final RowMapper<Event> eventMapper = new BeanPropertyRowMapper<>(Event.class);
 
     @Autowired
-    public EventDAO(JdbcTemplate jdbcTemplate){
+    public EventDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Event getEvent(int eventId) throws IllegalArgumentException{
+    public Event getEvent(int eventId) throws IllegalArgumentException {
         return jdbcTemplate.query("SELECT * FROM events WHERE id=?", new Object[]{eventId}, eventMapper)
                 .stream()
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("Could not find event with given ID in database."));
     }
-    public Event getEvent(String name) throws IllegalArgumentException{
+
+    public Event getEvent(String name) throws IllegalArgumentException {
         return jdbcTemplate.query("SELECT * FROM events WHERE name=?", new Object[]{name}, eventMapper)
                 .stream()
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("Could not find event with given name in database."));
     }
 
-    public void saveEvent(Event event){
+    public void saveEvent(Event event) {
         jdbcTemplate.update("INSERT INTO events (name, description, date, organizerid) VALUES (?, ?, ?, ?)",
                 event.getName(), event.getDescription(), event.getDate(), event.getOrganizerId(), eventMapper);
     }
