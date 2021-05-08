@@ -1,27 +1,62 @@
 package com.hse.models;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 
-public class User {
-    private Long id;
-    private String name;
-    private double rating;
+public class User implements UserDetails {
 
+    private long id;
+    private UserRole userRole;
+    private String name;
+    private String secondName;
+    private String patronymic;
+    private String username;
+    private String password;
+    private String specialization;
+    private double rating;
+    private String description;
+    private List<String> photos;
+    private List<Long> eventsId;
     public User() {
     }
 
-    public User(String name, double rating) {
+
+    public User(long id, UserRole userRole, String name, String secondName, String patronymic, String username,
+                String password, String specialization, double rating, String description, List<String> photos,
+                List<Long> eventsId) {
+        this.id = id;
+        this.userRole = userRole;
         this.name = name;
+        this.secondName = secondName;
+        this.patronymic = patronymic;
+        this.username = username;
+        this.password = password;
+        this.specialization = specialization;
         this.rating = rating;
+        this.description = description;
+        this.photos = photos;
+        this.eventsId = eventsId;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
+    }
+
+    public UserRole getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
     }
 
     public String getName() {
@@ -32,6 +67,48 @@ public class User {
         this.name = name;
     }
 
+    public String getSecondName() {
+        return secondName;
+    }
+
+    public void setSecondName(String secondName) {
+        this.secondName = secondName;
+    }
+
+    public String getPatronymic() {
+        return patronymic;
+    }
+
+    public void setPatronymic(String patronymic) {
+        this.patronymic = patronymic;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getSpecialization() {
+        return specialization;
+    }
+
+    public void setSpecialization(String specialization) {
+        this.specialization = specialization;
+    }
+
     public double getRating() {
         return rating;
     }
@@ -40,16 +117,71 @@ public class User {
         this.rating = rating;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<String> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<String> photos) {
+        this.photos = photos;
+    }
+
+    public List<Long> getEventsId() {
+        return eventsId;
+    }
+
+    public void setEventsId(List<Long> eventsId) {
+        this.eventsId = eventsId;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Double.compare(user.rating, rating) == 0 && Objects.equals(id, user.id) && Objects.equals(name, user.name);
+        return id == user.id && Double.compare(user.rating, rating) == 0 && userRole == user.userRole && Objects.equals(name, user.name) && Objects.equals(secondName, user.secondName) && Objects.equals(patronymic, user.patronymic) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(specialization, user.specialization) && Objects.equals(description, user.description) && Objects.equals(photos, user.photos) && Objects.equals(eventsId, user.eventsId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, rating);
+        return Objects.hash(id, userRole, name, secondName, patronymic, username, password, specialization, rating, description, photos, eventsId);
+    }
+
+    public enum UserRole {
+        USER,
+        CREATOR,
+        ORGANIZER
     }
 }
