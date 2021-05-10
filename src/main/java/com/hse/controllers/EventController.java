@@ -1,7 +1,7 @@
 package com.hse.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hse.exceptions.FileSystemException;
 import com.hse.exceptions.ServiceException;
 import com.hse.models.Event;
 import com.hse.models.EventRegistrationData;
@@ -29,28 +29,20 @@ public class EventController {
     }
 
     @PostMapping(value = "/load", consumes = {"application/json"})
-    public ResponseEntity<String> createEvent(@RequestBody EventRegistrationData eventRegistrationData) {
-        try {
-            Event event = eventRegistrationData.getEvent();
-            List<String> encodedImages = eventRegistrationData.getImages();
-            List<byte[]> images = ImageService.decodeImages(encodedImages);
-            ImageService.saveImagesToFileSystem(images);
-            List<String> imageHashes = HashService.hash(images);
-            event.setImageHashes(imageHashes);
-            eventService.saveEvent(event);
-            return ResponseEntity.ok("Event has been added.");
-        } catch (ServiceException exception){
-            return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<String> createEvent(@RequestBody EventRegistrationData eventRegistrationData) throws ServiceException {
+        Event event = eventRegistrationData.getEvent();
+        List<String> encodedImages = eventRegistrationData.getImages();
+        List<byte[]> images = ImageService.decodeImages(encodedImages);
+        ImageService.saveImagesToFileSystem(images);
+        List<String> imageHashes = HashService.hash(images);
+        event.setImageHashes(imageHashes);
+        eventService.saveEvent(event);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping(value = "/get", produces = {"application/json"})
-    public ResponseEntity<String> getEvent(@RequestParam("id") long id) {
-        try {
-            Event event  = eventService.getEvent(id);
-            return new ResponseEntity<>(event.toString(), HttpStatus.OK);
-        } catch (ServiceException exception) {
-            return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Event> getEvent(@RequestParam("id") long id) throws ServiceException {
+        Event event  = eventService.getEvent(id);
+        return new ResponseEntity<>(event, HttpStatus.OK);
     }
 }

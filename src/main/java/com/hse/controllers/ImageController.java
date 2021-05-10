@@ -31,27 +31,19 @@ public class ImageController {
     }
 
     @PostMapping(value = "/loadImages", consumes = {"application/json"})
-    public ResponseEntity<String> loadImages(@RequestBody ImageRegistrationData imageRegistrationData) {
-        try {
-            List<byte[]> images = ImageService.decodeImages(imageRegistrationData.getImages());
-            ImageService.saveImagesToFileSystem(images);
-            long destinationId   = imageRegistrationData.getDestinationId();
-            Entity destination   = imageRegistrationData.getDestination(); //todo proper naming
-            imageService.addImages(images, destinationId, destination);
-        } catch (ServiceException exception) {
-            return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<String> loadImages(@RequestBody ImageRegistrationData imageRegistrationData) throws ServiceException {
+        List<byte[]> images = ImageService.decodeImages(imageRegistrationData.getImages());
+        ImageService.saveImagesToFileSystem(images);
+        long destinationId   = imageRegistrationData.getDestinationId();
+        Entity destination   = imageRegistrationData.getDestination(); //todo proper naming
+        imageService.addImages(images, destinationId, destination);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping(value = "/getImages")
-    public ResponseEntity<String> getImages(@RequestParam("imageHashes") List<String> imageHashes) {
-        try {
-            List<byte[]> images = ImageService.loadImagesFromFileSystem(imageHashes);
-            List<String> encodedImages = images.stream().map(Coder::encode).collect(Collectors.toList());
-            return new ResponseEntity<>(encodedImages.toString(), HttpStatus.OK);
-        } catch (ServiceException exception) {
-            return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<List<String>> getImages(@RequestParam("imageHashes") List<String> imageHashes) throws ServiceException {
+        List<byte[]> images = ImageService.loadImagesFromFileSystem(imageHashes);
+        List<String> encodedImages = images.stream().map(Coder::encode).collect(Collectors.toList());
+        return new ResponseEntity<>(encodedImages, HttpStatus.OK);
     }
 }

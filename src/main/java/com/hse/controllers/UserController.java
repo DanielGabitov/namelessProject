@@ -1,5 +1,7 @@
 package com.hse.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hse.exceptions.FileSystemException;
 import com.hse.exceptions.ServiceException;
 import com.hse.models.User;
@@ -21,6 +23,8 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
 
+    private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private final UserService userService;
 
     @Autowired
@@ -29,28 +33,20 @@ public class UserController {
     }
 
     @PostMapping(value = "/load", consumes = {"application/json"})
-    public ResponseEntity<String> createUser(@RequestBody UserRegistrationData userRegistrationData) {
-        try {
-            User user = userRegistrationData.getUser();
-            List<String> encodedImages = userRegistrationData.getImages();
-            List<byte[]> images = ImageService.decodeImages(encodedImages);
-            ImageService.saveImagesToFileSystem(images);
-            List<String> imageHashes = HashService.hash(images);
-            user.setImages(imageHashes);
-            userService.createUser(user);
-        } catch (ServiceException exception) {
-            return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<String> createUser(@RequestBody UserRegistrationData userRegistrationData) throws ServiceException {
+        User user = userRegistrationData.getUser();
+        List<String> encodedImages = userRegistrationData.getImages();
+        List<byte[]> images = ImageService.decodeImages(encodedImages);
+        ImageService.saveImagesToFileSystem(images);
+        List<String> imageHashes = HashService.hash(images);
+        user.setImages(imageHashes);
+        userService.createUser(user);
         return new ResponseEntity<>("User has been added.", HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{id}", produces = {"application/json"})
-    public ResponseEntity<String> getUserById(@PathVariable("id") Long userId) {
-        try {
-            UserDetails user = userService.loadUserById(userId);
-            return new ResponseEntity<>(user.toString(), HttpStatus.OK);
-        } catch (UsernameNotFoundException exception){
-            return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @GetMapping(value = "/get", produces = {"application/json"})
+    public ResponseEntity<User> getUser(@RequestParam("id") Long userId) {
+        User user = userService.loadUserById(userId);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 }
