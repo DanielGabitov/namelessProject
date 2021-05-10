@@ -1,7 +1,9 @@
 package com.hse.models;
 
+import com.hse.enums.Specialization;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.hse.enums.UserRole;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,17 +19,17 @@ public class User implements UserDetails {
     private String patronymic;
     private String username;
     private String password;
-    private String specialization;
+    private Specialization specialization;
     private double rating;
     private String description;
-    private List<String> photos;
+    private List<String> images;
     private List<Long> eventsId;
+
     public User() {
     }
 
-
     public User(long id, UserRole userRole, String name, String secondName, String patronymic, String username,
-                String password, String specialization, double rating, String description, List<String> photos,
+                String password, Specialization specialization, double rating, String description, List<String> images,
                 List<Long> eventsId) {
         this.id = id;
         this.userRole = userRole;
@@ -39,7 +41,7 @@ public class User implements UserDetails {
         this.specialization = specialization;
         this.rating = rating;
         this.description = description;
-        this.photos = photos;
+        this.images = images;
         this.eventsId = eventsId;
     }
 
@@ -101,11 +103,11 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public String getSpecialization() {
+    public Specialization getSpecialization() {
         return specialization;
     }
 
-    public void setSpecialization(String specialization) {
+    public void setSpecialization(Specialization specialization) {
         this.specialization = specialization;
     }
 
@@ -125,12 +127,12 @@ public class User implements UserDetails {
         this.description = description;
     }
 
-    public List<String> getPhotos() {
-        return photos;
+    public List<String> getImages() {
+        return images;
     }
 
-    public void setPhotos(List<String> photos) {
-        this.photos = photos;
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
     public List<Long> getEventsId() {
@@ -171,17 +173,11 @@ public class User implements UserDetails {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id == user.id && Double.compare(user.rating, rating) == 0 && userRole == user.userRole && Objects.equals(name, user.name) && Objects.equals(secondName, user.secondName) && Objects.equals(patronymic, user.patronymic) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(specialization, user.specialization) && Objects.equals(description, user.description) && Objects.equals(photos, user.photos) && Objects.equals(eventsId, user.eventsId);
+        return id == user.id && Double.compare(user.rating, rating) == 0 && userRole == user.userRole && Objects.equals(name, user.name) && Objects.equals(secondName, user.secondName) && Objects.equals(patronymic, user.patronymic) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(specialization, user.specialization) && Objects.equals(description, user.description) && Objects.equals(images, user.images) && Objects.equals(eventsId, user.eventsId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userRole, name, secondName, patronymic, username, password, specialization, rating, description, photos, eventsId);
-    }
-
-    public enum UserRole {
-        USER,
-        CREATOR,
-        ORGANIZER
+        return Objects.hash(id, userRole, name, secondName, patronymic, username, password, specialization, rating, description, images, eventsId);
     }
 }

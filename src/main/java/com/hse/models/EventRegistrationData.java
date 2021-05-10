@@ -3,6 +3,20 @@ package com.hse.models;
 import java.util.List;
 import java.util.Objects;
 
+// {
+//         "event" : {"name"            : "name",
+//             "description"     : "description",
+//             "imageHashes"     : [],
+//             "organizerIDs"    : [],
+//             "participantsIDs" : [],
+//             "rating"          : 0.4,
+//             "geoData"         : "geoData",
+//             "specialization"  : "LITERATURE",
+//             "date"            : "2020-04-04"
+//         },
+//         "images": ["data"]
+// }
+
 public class EventRegistrationData {
     private Event event;
     private List<String> images;

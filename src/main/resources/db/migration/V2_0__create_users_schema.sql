@@ -10,6 +10,6 @@ CREATE TABLE users
     specialization varchar(40),
     rating         real,
     description    text,
-    photos         bigint[],
+    photos         varchar(40)[],
     eventsId       bigint[]
 );

@@ -51,17 +51,14 @@ public class UserService implements UserDetailsService {
     }
 
     public void addImages(long id, List<String> photoHashes) throws ServiceException {
-        User user;
         try {
-            user = loadUserById(id);
+            User user = loadUserById(id);
+            user.getImages().addAll(photoHashes);
+            userDAO.updateImageHashes(id, user.getImages());
         } catch (UsernameNotFoundException exception) {
             throw new ServiceException(exception.getMessage(), exception);
-        }
-        user.getPhotos().addAll(photoHashes);
-        try {
-            userDAO.updatePhotosHashes(id, user.getPhotos());
         } catch (DataAccessException exception){
-            throw new ServiceException("Failed to update event in a database.", exception);
+            throw new ServiceException("Failed to update user in a database.", exception);
         }
     }
 }

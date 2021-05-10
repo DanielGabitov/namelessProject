@@ -1,10 +1,12 @@
 package com.hse.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hse.exceptions.FileSystemException;
 import com.hse.exceptions.ServiceException;
 import com.hse.models.Event;
 import com.hse.models.EventRegistrationData;
 import com.hse.services.EventService;
+import com.hse.services.ImageService;
 import com.hse.utils.HashService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,8 @@ import java.util.List;
 @RequestMapping("/api/events")
 public class EventController {
 
+    private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private final EventService eventService;
 
     @Autowired
@@ -26,30 +30,27 @@ public class EventController {
 
     @PostMapping(value = "/load", consumes = {"application/json"})
     public ResponseEntity<String> createEvent(@RequestBody EventRegistrationData eventRegistrationData) {
-        Event event = eventRegistrationData.getEvent();
         try {
-            List<String> imageHashes = HashService.getImageHashes(eventRegistrationData.getImages());
+            Event event = eventRegistrationData.getEvent();
+            List<String> encodedImages = eventRegistrationData.getImages();
+            List<byte[]> images = ImageService.decodeImages(encodedImages);
+            ImageService.saveImagesToFileSystem(images);
+            List<String> imageHashes = HashService.hash(images);
             event.setImageHashes(imageHashes);
-        } catch (FileSystemException exception) {
-            return new ResponseEntity(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        try {
             eventService.saveEvent(event);
-        } catch (ServiceException exception) {
+            return ResponseEntity.ok("Event has been added.");
+        } catch (ServiceException exception){
             return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return ResponseEntity.ok("Event has been added.");
     }
 
     @GetMapping(value = "/get", produces = {"application/json"})
     public ResponseEntity<String> getEvent(@RequestParam("id") long id) {
-        Event event;
         try {
-            event = eventService.getEvent(id);
+            Event event  = eventService.getEvent(id);
+            return new ResponseEntity<>(event.toString(), HttpStatus.OK);
         } catch (ServiceException exception) {
             return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(event.toString(), HttpStatus.OK);
     }
 }

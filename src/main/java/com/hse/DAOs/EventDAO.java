@@ -1,6 +1,7 @@
 package com.hse.DAOs;
 
 import com.hse.models.Event;
+import com.hse.utils.ArraySQLValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -41,12 +42,12 @@ public class EventDAO {
                         " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 event.getName(),
                 event.getDescription(),
-                event.getImageHashes(),
-                event.getOrganizerIDs(),
-                event.getParticipantsIDs(),
+                ArraySQLValue.create(event.getImageHashes().toArray(), "varchar"),
+                ArraySQLValue.create(event.getOrganizerIDs().toArray(), "bigint"),
+                ArraySQLValue.create(event.getParticipantsIDs().toArray(), "bigint"),
                 event.getRating(),
                 event.getGeoData(),
-                event.getSpecialization(),
+                event.getSpecialization().name(),
                 event.getDate());
     }
 

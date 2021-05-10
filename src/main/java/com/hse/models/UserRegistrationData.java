@@ -5,14 +5,14 @@ import java.util.Objects;
 
 public class UserRegistrationData {
     private User user;
-    private List<String> photos;
+    private List<String> images;
 
     public UserRegistrationData() {
     }
 
-    public UserRegistrationData(User user, List<String> photos) {
+    public UserRegistrationData(User user, List<String> images) {
         this.user = user;
-        this.photos = photos;
+        this.images = images;
     }
 
     public User getUser() {
@@ -23,12 +23,12 @@ public class UserRegistrationData {
         this.user = user;
     }
 
-    public List<String> getPhotos() {
-        return photos;
+    public List<String> getImages() {
+        return images;
     }
 
-    public void setPhotos(List<String> photos) {
-        this.photos = photos;
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
     @Override
@@ -36,19 +36,19 @@ public class UserRegistrationData {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserRegistrationData that = (UserRegistrationData) o;
-        return Objects.equals(user, that.user) && Objects.equals(photos, that.photos);
+        return Objects.equals(user, that.user) && Objects.equals(images, that.images);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user, images);
     }
 
     @Override
     public String toString() {
         return "UserRegistrationData{" +
                 "user=" + user +
-                ", photos=" + photos +
+                ", images=" + images +
                 '}';
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(user, photos);
     }
 }

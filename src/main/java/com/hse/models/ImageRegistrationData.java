@@ -1,32 +1,29 @@
 package com.hse.models;
 
+import com.hse.enums.Entity;
+
 import java.util.List;
 import java.util.Objects;
 
 public class ImageRegistrationData {
 
-    public enum Destination {
-        EVENT,
-        USER
-    }
-
-    private Destination destination;
+    private Entity destination;
     private List<String> images;
     private long destinationId;
 
     public ImageRegistrationData() {}
 
-    public ImageRegistrationData(Destination destination, List<String> images, long destinationId) {
+    public ImageRegistrationData(Entity destination, List<String> images, long destinationId) {
         this.destination = destination;
         this.images = images;
         this.destinationId = destinationId;
     }
 
-    public Destination getDestination() {
+    public Entity getDestination() {
         return destination;
     }
 
-    public void setDestination(Destination destination) {
+    public void setDestination(Entity destination) {
         this.destination = destination;
     }
 

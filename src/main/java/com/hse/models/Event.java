@@ -3,16 +3,10 @@ package com.hse.models;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
+import com.hse.enums.Specialization;
 
 
 public class Event {
-
-    public enum EventSpecialization {
-        ART,
-        MUSIC,
-        PHOTOGRAPHY,
-        LITERATURE
-    }
 
     private Long id;
     private String name;
@@ -22,23 +16,24 @@ public class Event {
     private List<Long> participantsIDs;
     private double rating;
     private String geoData;
-    private EventSpecialization specialization;
+    private Specialization specialization;
     private Timestamp date;
+
     public Event() {
     }
 
     //*
-    // {
-    // "name"            : "name",
-    // "description"     : "description",
-    // "imageHashes"     : ["hash#1, hash#2"],
-    // "organizerIDs"    : [1, 2],
-    // "participantsIDs" : [1, 2],
-    // "rating"          : 0.4,
-    // "geoData"         : "geoData",
-    // "specialization"  : "specialization",
-    // "date"            : "04-23-17 04:34:22"
-    // }
+//     {
+//     "name"            : "name",
+//     "description"     : "description",
+//     "imageHashes"     : ["hash#1, hash#2"],
+//     "organizerIDs"    : [1, 2],
+//     "participantsIDs" : [1, 2],
+//     "rating"          : 0.4,
+//     "geoData"         : "geoData",
+//     "specialization"  : "specialization",
+//     "date"            : "04-23-17 04:34:22"
+//     }
     //
     //
     //
@@ -46,7 +41,7 @@ public class Event {
 
     public Event(Long id, String name, String description,
                  List<String> imageHashes, List<Long> organizerIDs, List<Long> participantsIDs, double rating,
-                 String geoData, EventSpecialization specialization, Timestamp date) {
+                 String geoData, Specialization specialization, Timestamp date) {
 
         this.id = id;
         this.name = name;
@@ -124,11 +119,11 @@ public class Event {
         this.geoData = geoData;
     }
 
-    public EventSpecialization getSpecialization() {
+    public Specialization getSpecialization() {
         return specialization;
     }
 
-    public void setSpecialization(EventSpecialization specialization) {
+    public void setSpecialization(Specialization specialization) {
         this.specialization = specialization;
     }
 

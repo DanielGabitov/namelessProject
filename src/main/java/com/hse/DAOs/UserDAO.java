@@ -1,6 +1,7 @@
 package com.hse.DAOs;
 
 import com.hse.models.User;
+import com.hse.utils.ArraySQLValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -27,8 +28,8 @@ public class UserDAO {
                 .orElse(null);
     }
 
-    public User getUserByUsername(String login) throws IllegalArgumentException {
-        return jdbcTemplate.query("SELECT * FROM users WHERE login=?", new Object[]{login}, userMapper)
+    public User getUserByUsername(String username) throws IllegalArgumentException {
+        return jdbcTemplate.query("SELECT * FROM users WHERE username=?", new Object[]{username}, userMapper)
                 .stream()
                 .findAny()
                 .orElse(null);
@@ -36,14 +37,17 @@ public class UserDAO {
 
     public void saveUser(User user) { //todo matching names with eventDAO
         jdbcTemplate.update(
-                "INSERT INTO users (name, login, password, rating) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                user.getUserRole(), user.getName(), user.getSecondName(), user.getPatronymic(), user.getUsername(),
-                user.getPassword(), user.getSpecialization(), user.getRating(), user.getDescription(), user.getPhotos(),
-                user.getEventsId()
+                "INSERT INTO users (userRole, name, secondName, patronymic, username, password, specialization, " +
+                        "rating, description, images, eventsid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                user.getUserRole().name(), user.getName(), user.getSecondName(), user.getPatronymic(),
+                user.getUsername(), user.getPassword(), user.getSpecialization().name(), user.getRating(),
+                user.getDescription(),
+                ArraySQLValue.create(user.getImages().toArray()),
+                ArraySQLValue.create(user.getEventsId().toArray())
         );
     }
 
-    public void updatePhotosHashes(long id, List<String> photosHashes){
-        jdbcTemplate.update("UPDATE users SET photos = ? where id = ?", new Object[]{photosHashes, id}, userMapper);
+    public void updateImageHashes(long id, List<String> imagesHashes){
+        jdbcTemplate.update("UPDATE users SET images = ? where id = ?", new Object[]{imagesHashes, id}, userMapper);
     }
 }
