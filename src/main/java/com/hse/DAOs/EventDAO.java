@@ -3,7 +3,6 @@ package com.hse.DAOs;
 import com.hse.models.Event;
 import com.hse.utils.ArraySQLValue;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -14,11 +13,12 @@ import java.util.List;
 public class EventDAO {
     private final JdbcTemplate jdbcTemplate;
 
-    private final RowMapper<Event> eventMapper = new BeanPropertyRowMapper<>(Event.class);
+    private final RowMapper<Event> eventMapper;
 
     @Autowired
-    public EventDAO(JdbcTemplate jdbcTemplate) {
+    public EventDAO(JdbcTemplate jdbcTemplate, RowMapper<Event> eventMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.eventMapper = eventMapper;
     }
 
 
