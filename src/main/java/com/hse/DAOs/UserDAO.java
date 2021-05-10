@@ -42,8 +42,8 @@ public class UserDAO {
                 user.getUserRole().name(), user.getName(), user.getSecondName(), user.getPatronymic(),
                 user.getUsername(), user.getPassword(), user.getSpecialization().name(), user.getRating(),
                 user.getDescription(),
-                ArraySQLValue.create(user.getImages().toArray()),
-                ArraySQLValue.create(user.getEventsId().toArray())
+                ArraySQLValue.create(user.getImages().toArray(), "varchar"),
+                ArraySQLValue.create(user.getEventsId().toArray(), "bigint")
         );
     }
 
