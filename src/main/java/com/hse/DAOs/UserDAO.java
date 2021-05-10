@@ -3,7 +3,6 @@ package com.hse.DAOs;
 import com.hse.models.User;
 import com.hse.utils.ArraySQLValue;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -14,11 +13,12 @@ import java.util.List;
 public class UserDAO {
     private final JdbcTemplate jdbcTemplate;
 
-    private final RowMapper<User> userMapper = new BeanPropertyRowMapper<>(User.class);
+    private final RowMapper<User> userMapper;
 
     @Autowired
-    public UserDAO(JdbcTemplate jdbcTemplate) {
+    public UserDAO(JdbcTemplate jdbcTemplate, RowMapper<User> userMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.userMapper = userMapper;
     }
 
     public User getUserById(Long userId) throws IllegalArgumentException {
