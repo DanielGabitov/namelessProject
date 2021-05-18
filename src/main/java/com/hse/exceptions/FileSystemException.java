@@ -1,6 +1,6 @@
 package com.hse.exceptions;
 
-public class FileSystemException extends Exception {
+public class FileSystemException extends RuntimeException {
 
     public FileSystemException() {
     }

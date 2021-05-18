@@ -3,8 +3,9 @@ package com.hse.services;
 import com.hse.DAOs.EventDAO;
 import com.hse.exceptions.ServiceException;
 import com.hse.models.Event;
+import com.hse.models.EventRegistrationData;
+import com.hse.utils.HashUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,33 +19,29 @@ public class EventService {
         this.eventDAO = eventDAO;
     }
 
-    public void saveEvent(Event event) throws ServiceException {
-        try {
-            eventDAO.saveEvent(event);
-        } catch (DataAccessException e) {
-            throw new ServiceException("Failed to save event to a DataBase", e);
-        }
+    public void saveEvent(EventRegistrationData eventRegistrationData) {
+        Event event = eventRegistrationData.getEvent();
+        int eventId = eventDAO.saveEvent(event);
+
+        // todo these lines appear in saveUser as well but Im not sure whether its a good idea to create 1 method for them
+        List<String> encodedImages = eventRegistrationData.getImages();
+        List<byte[]> images = ImageService.decodeImages(encodedImages);
+        ImageService.saveImagesToFileSystem(images);
+        List<String> imageHashes = HashUtils.hash(images);
+
+        addImages(eventId, imageHashes);
     }
 
-    public Event getEvent(long id) throws ServiceException {
-        try {
-            List<Event> eventList = eventDAO.getEvent(id);
-            if (eventList.isEmpty()) {
-                throw new ServiceException("Failed to find event with given ID.");
-            }
-            return eventList.get(0);
-        } catch (DataAccessException exception) {
-            throw new ServiceException("Failed to access a database.", exception);
+    public Event getEvent(long id) {
+        List<Event> eventList = eventDAO.getEvent(id);
+        if (eventList.isEmpty()) {
+            throw new ServiceException("Failed to find event with given ID.");
         }
+        return eventList.get(0);
     }
 
-    public void addImages(long id, List<String> imageHashes) throws ServiceException {
-        Event event = getEvent(id);
-        event.getImageHashes().addAll(imageHashes);
-        try {
-            eventDAO.updateImageHashes(id, event.getImageHashes());
-        } catch (DataAccessException exception){
-            throw new ServiceException("Failed to update event in a database.", exception);
-        }
+    //todo deleteImages
+    public void addImages(long id, List<String> imageHashes) {
+        eventDAO.updateImageHashes(id, imageHashes);
     }
 }

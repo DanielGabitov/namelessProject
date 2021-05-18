@@ -5,7 +5,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import java.util.LinkedList;
 import java.util.List;
 
-public class HashService {
+public class HashUtils {
     public static String hash(byte[] image) {
         return DigestUtils.sha1Hex(image);
     }

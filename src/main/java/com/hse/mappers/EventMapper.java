@@ -17,8 +17,8 @@ public class EventMapper implements RowMapper<Event> {
         event.setId(resultSet.getLong("id"));
         event.setName(resultSet.getString("name"));
         event.setDescription(resultSet.getString("description"));
-        String[] arrayOfImageHashes = (String[]) resultSet.getArray("imageHashes").getArray();
-        event.setImageHashes(Arrays.asList(arrayOfImageHashes));
+        String[] arrayOfImageHashes = (String[]) resultSet.getArray("images").getArray();
+        event.setImages(Arrays.asList(arrayOfImageHashes));
         Long[] arrayOfOrganizerIDs = (Long[]) resultSet.getArray("organizerIDs").getArray();
         event.setOrganizerIDs(Arrays.asList(arrayOfOrganizerIDs));
         Long[] arrayOfParticipantsIDs = (Long[]) resultSet.getArray("participantsIDs").getArray();

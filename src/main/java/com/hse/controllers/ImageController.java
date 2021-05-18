@@ -1,49 +1,37 @@
 package com.hse.controllers;
 
 import com.hse.enums.Entity;
-import com.hse.exceptions.ServiceException;
 import com.hse.models.ImageRegistrationData;
-import com.hse.services.EventService;
 import com.hse.services.ImageService;
-import com.hse.services.UserService;
-import com.hse.utils.Coder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/images")
 public class ImageController {
 
-    private final EventService eventService;
-    private final UserService  userService;
+
     private final ImageService imageService;
 
     @Autowired
-    public ImageController(EventService eventService, UserService userService, ImageService imageService){
-        this.eventService = eventService;
-        this.userService  = userService;
+    public ImageController(ImageService imageService){
         this.imageService = imageService;
     }
 
-    @PostMapping(value = "/loadImages", consumes = {"application/json"})
-    public ResponseEntity<String> loadImages(@RequestBody ImageRegistrationData imageRegistrationData) throws ServiceException {
-        List<byte[]> images = ImageService.decodeImages(imageRegistrationData.getImages());
-        ImageService.saveImagesToFileSystem(images);
-        long destinationId   = imageRegistrationData.getDestinationId();
-        Entity destination   = imageRegistrationData.getDestination(); //todo proper naming
-        imageService.addImages(images, destinationId, destination);
+    @PostMapping(value = "", consumes = {"application/json"})
+    public ResponseEntity<String> loadImages(@RequestBody ImageRegistrationData imageRegistrationData) {
+        imageService.saveImages(imageRegistrationData);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping(value = "/getImages")
-    public ResponseEntity<List<String>> getImages(@RequestParam("imageHashes") List<String> imageHashes) throws ServiceException {
-        List<byte[]> images = ImageService.loadImagesFromFileSystem(imageHashes);
-        List<String> encodedImages = images.stream().map(Coder::encode).collect(Collectors.toList());
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<List<String>> getImages(@PathVariable("id") Long id, @RequestParam String entity) {
+        Entity source = Entity.valueOf(entity);
+        List<String> encodedImages = imageService.getImages(id, source);
         return new ResponseEntity<>(encodedImages, HttpStatus.OK);
     }
 }

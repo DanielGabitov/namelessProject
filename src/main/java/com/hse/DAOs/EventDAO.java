@@ -26,12 +26,12 @@ public class EventDAO {
         return jdbcTemplate.query("SELECT * FROM events WHERE id= ?", new Object[]{id}, eventMapper);
     }
 
-    public void saveEvent(Event event) {
-        jdbcTemplate.update(
+    public int saveEvent(Event event) {
+        return jdbcTemplate.update(
                 "INSERT INTO events" +
                         "(name," +
                         " description," +
-                        " imageHashes," +
+                        " images," +
                         " organizerIDs," +
                         " participantsIDs," +
                         " rating," +
@@ -42,7 +42,7 @@ public class EventDAO {
                         " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 event.getName(),
                 event.getDescription(),
-                ArraySQLValue.create(event.getImageHashes().toArray(), "varchar"),
+                ArraySQLValue.create(event.getImages().toArray(), "varchar"),
                 ArraySQLValue.create(event.getOrganizerIDs().toArray(), "bigint"),
                 ArraySQLValue.create(event.getParticipantsIDs().toArray(), "bigint"),
                 event.getRating(),
@@ -52,6 +52,7 @@ public class EventDAO {
     }
 
     public void updateImageHashes(long id, List<String> imageHashes){
-        jdbcTemplate.update("UPDATE events SET imagehashes = ? where id = ?", new Object[]{imageHashes, id}, eventMapper);
+        jdbcTemplate.update("UPDATE events set images = images || ? where id = ?",
+                ArraySQLValue.create(imageHashes.toArray(), "varchar"), id);
     }
 }

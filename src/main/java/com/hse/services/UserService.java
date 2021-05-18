@@ -1,10 +1,10 @@
 package com.hse.services;
 
 import com.hse.DAOs.UserDAO;
-import com.hse.exceptions.ServiceException;
 import com.hse.models.User;
+import com.hse.models.UserRegistrationData;
+import com.hse.utils.HashUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,7 +22,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String login) {
         User user = userDAO.getUserByUsername(login);
         if (user == null) {
             throw new UsernameNotFoundException("There is no user with this username.");
@@ -30,7 +30,7 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public User loadUserById(Long id) throws UsernameNotFoundException {
+    public User loadUserById(Long id) {
         User user = userDAO.getUserById(id);
         if (user == null) {
             throw new UsernameNotFoundException("There is no user with this username.");
@@ -38,27 +38,20 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public void createUser(User user) throws ServiceException {
-        User foundUser = userDAO.getUserByUsername(user.getUsername());
-        if (foundUser != null) {
-            throw new ServiceException("There is already a user with this username.");
-        }
-        try {
-            userDAO.saveUser(user);
-        } catch (DataAccessException exception) {
-            throw new ServiceException(exception);
-        }
+    public void saveUser(UserRegistrationData userRegistrationData) {
+        User user = userRegistrationData.getUser();
+        int userId = userDAO.saveUser(user);
+
+        List<String> encodedImages = userRegistrationData.getImages();
+        List<byte[]> images = ImageService.decodeImages(encodedImages);
+        ImageService.saveImagesToFileSystem(images);
+        List<String> imageHashes = HashUtils.hash(images);
+        user.setImages(imageHashes);
+
+        addImages(userId, imageHashes);
     }
 
-    public void addImages(long id, List<String> photoHashes) throws ServiceException {
-        try {
-            User user = loadUserById(id);
-            user.getImages().addAll(photoHashes);
-            userDAO.updateImageHashes(id, user.getImages());
-        } catch (UsernameNotFoundException exception) {
-            throw new ServiceException(exception.getMessage(), exception);
-        } catch (DataAccessException exception){
-            throw new ServiceException("Failed to update user in a database.", exception);
-        }
+    public void addImages(long id, List<String> imageHashes){
+        userDAO.updateImageHashes(id, imageHashes);
     }
 }

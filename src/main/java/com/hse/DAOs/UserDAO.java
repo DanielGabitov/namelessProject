@@ -35,8 +35,8 @@ public class UserDAO {
                 .orElse(null);
     }
 
-    public void saveUser(User user) { //todo matching names with eventDAO
-        jdbcTemplate.update(
+    public int saveUser(User user) { //todo matching names with eventDAO
+        return jdbcTemplate.update(
                 "INSERT INTO users (userRole, name, secondName, patronymic, username, password, specialization, " +
                         "rating, description, images, eventsid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 user.getUserRole().name(), user.getName(), user.getSecondName(), user.getPatronymic(),
@@ -47,7 +47,8 @@ public class UserDAO {
         );
     }
 
-    public void updateImageHashes(long id, List<String> imagesHashes){
-        jdbcTemplate.update("UPDATE users SET images = ? where id = ?", new Object[]{imagesHashes, id}, userMapper);
+    public void updateImageHashes(long id, List<String> imageHashes){
+        jdbcTemplate.update("UPDATE users set images = images || ? where id = ?",
+                ArraySQLValue.create(imageHashes.toArray(), "varchar"), id);
     }
 }

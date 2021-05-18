@@ -1,9 +1,9 @@
 package com.hse.models;
 
 import com.hse.enums.Specialization;
+import com.hse.enums.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.hse.enums.UserRole;
 
 import java.util.Collection;
 import java.util.List;

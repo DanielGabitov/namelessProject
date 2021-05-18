@@ -1,14 +1,12 @@
 package com.hse.systems;
 
 import com.hse.exceptions.FileSystemException;
-import com.hse.utils.HashService;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 public class FileSystemInteractor {
 
@@ -16,7 +14,7 @@ public class FileSystemInteractor {
     private static final Path ROOT_PATH = Paths.get(System.getProperty("user.dir"));
     private static final Path IMAGE_DIRECTORY = ROOT_PATH.resolve(IMAGE_DIRECTORY_NAME);
 
-    public static void saveImage(byte[] data, String fileName) throws FileSystemException {
+    public static void saveImage(byte[] data, String fileName) {
         File imageFile = IMAGE_DIRECTORY.resolve(fileName).toFile();
         try {
             FileUtils.writeByteArrayToFile(imageFile, data);
@@ -25,7 +23,7 @@ public class FileSystemInteractor {
         }
     }
 
-    public static byte[] getImage(String imageHash) throws FileSystemException {
+    public static byte[] getImage(String imageHash) {
         File imageFile = IMAGE_DIRECTORY.resolve(imageHash).toFile();
         try {
             return FileUtils.readFileToByteArray(imageFile);
