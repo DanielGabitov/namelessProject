@@ -22,7 +22,7 @@ public class EventController {
     @PostMapping(value = "", consumes = {"application/json"})
     public ResponseEntity<String> createEvent(@RequestBody EventRegistrationData eventRegistrationData) {
         eventService.saveEvent(eventRegistrationData);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("Event has been added", HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}", produces = {"application/json"})

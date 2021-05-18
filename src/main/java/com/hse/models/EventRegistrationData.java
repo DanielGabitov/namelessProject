@@ -6,7 +6,7 @@ import java.util.Objects;
 // {
 //         "event" : {"name"            : "name",
 //             "description"     : "description",
-//             "imageHashes"     : [],
+//             "images"          : [],
 //             "organizerIDs"    : [],
 //             "participantsIDs" : [],
 //             "rating"          : 0.4,

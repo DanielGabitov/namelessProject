@@ -5,54 +5,64 @@ import com.hse.utils.ArraySQLValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 public class EventDAO {
-    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     private final RowMapper<Event> eventMapper;
 
     @Autowired
-    public EventDAO(JdbcTemplate jdbcTemplate, RowMapper<Event> eventMapper) {
-        this.jdbcTemplate = jdbcTemplate;
+    public EventDAO(NamedParameterJdbcTemplate namedJdbcTemplate, RowMapper<Event> eventMapper) {
+        this.namedJdbcTemplate = namedJdbcTemplate;
         this.eventMapper = eventMapper;
     }
 
 
     public List<Event> getEvent(long id) {
-        return jdbcTemplate.query("SELECT * FROM events WHERE id= ?", new Object[]{id}, eventMapper);
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("id", id);
+        return namedJdbcTemplate.query("SELECT * FROM events WHERE id= :id", map, eventMapper);
     }
 
     public int saveEvent(Event event) {
-        return jdbcTemplate.update(
+        MapSqlParameterSource map = new MapSqlParameterSource();
+
+        map.addValue("name", event.getName());
+        map.addValue("description", event.getDescription());
+        map.addValue("images", ArraySQLValue.create(event.getImages().toArray(), "varchar"));
+
+        map.addValue("organizerIDs",
+                ArraySQLValue.create(event.getOrganizerIDs().toArray(), "bigint"));
+
+        map.addValue("participantsIDs",
+                ArraySQLValue.create(event.getParticipantsIDs().toArray(), "bigint"));
+
+        map.addValue("rating", event.getRating());
+        map.addValue("geoData", event.getGeoData());
+        map.addValue("specialization", event.getSpecialization().name());
+        map.addValue("date", event.getDate());
+
+        return namedJdbcTemplate.update(
                 "INSERT INTO events" +
-                        "(name," +
-                        " description," +
-                        " images," +
-                        " organizerIDs," +
-                        " participantsIDs," +
-                        " rating," +
-                        " geoData," +
-                        " specialization," +
-                        " date" +
-                        ")" +
-                        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                event.getName(),
-                event.getDescription(),
-                ArraySQLValue.create(event.getImages().toArray(), "varchar"),
-                ArraySQLValue.create(event.getOrganizerIDs().toArray(), "bigint"),
-                ArraySQLValue.create(event.getParticipantsIDs().toArray(), "bigint"),
-                event.getRating(),
-                event.getGeoData(),
-                event.getSpecialization().name(),
-                event.getDate());
+                        "(name, description, images, organizerIDs, participantsIDs," +
+                        " rating, geoData, specialization, date)" +
+                        " VALUES (:name, :description , :images, :organizerIDs, :participantsIDs," +
+                        " :rating, :geoData, :specialization, :date)", map);
     }
 
     public void updateImageHashes(long id, List<String> imageHashes){
-        jdbcTemplate.update("UPDATE events set images = images || ? where id = ?",
-                ArraySQLValue.create(imageHashes.toArray(), "varchar"), id);
+        MapSqlParameterSource map = new MapSqlParameterSource();
+
+        map.addValue("id", id);
+        map.addValue("newImages", ArraySQLValue.create(imageHashes.toArray(), "varchar"));
+
+        namedJdbcTemplate.update("UPDATE events set images = images || :newImages where id = :id", map);
     }
 }

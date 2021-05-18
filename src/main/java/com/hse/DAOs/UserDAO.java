@@ -3,52 +3,62 @@ package com.hse.DAOs;
 import com.hse.models.User;
 import com.hse.utils.ArraySQLValue;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 public class UserDAO {
-    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final RowMapper<User> userMapper;
 
     @Autowired
-    public UserDAO(JdbcTemplate jdbcTemplate, RowMapper<User> userMapper) {
-        this.jdbcTemplate = jdbcTemplate;
+    public UserDAO(NamedParameterJdbcTemplate namedParameterJdbcTemplate, RowMapper<User> userMapper) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
         this.userMapper = userMapper;
     }
 
-    public User getUserById(Long userId) throws IllegalArgumentException {
-        return jdbcTemplate.query("SELECT * FROM users WHERE id=?", new Object[]{userId}, userMapper)
-                .stream()
-                .findAny()
-                .orElse(null);
+    public List<User> getUserById(Long userId) throws IllegalArgumentException {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("id", userId);
+        return namedParameterJdbcTemplate.query("SELECT * FROM users WHERE id=:id", map, userMapper);
     }
 
-    public User getUserByUsername(String username) throws IllegalArgumentException {
-        return jdbcTemplate.query("SELECT * FROM users WHERE username=?", new Object[]{username}, userMapper)
-                .stream()
-                .findAny()
-                .orElse(null);
+    public List<User> getUserByUsername(String userName) throws IllegalArgumentException {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("userName", userName);
+        return namedParameterJdbcTemplate.query("SELECT * FROM users WHERE username=:userName", map, userMapper);
     }
 
-    public int saveUser(User user) { //todo matching names with eventDAO
-        return jdbcTemplate.update(
+    public int saveUser(User user) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("userRole", user.getUserRole().name());
+        map.addValue("name", user.getName());
+        map.addValue("secondName", user.getSecondName());
+        map.addValue("patronymic", user.getPatronymic());
+        map.addValue("userName", user.getUsername());
+        map.addValue("password", user.getPassword());
+        map.addValue("specialization", user.getSpecialization().name());
+        map.addValue("rating", user.getRating());
+        map.addValue("description", user.getDescription());
+        map.addValue("images", ArraySQLValue.create(user.getImages().toArray(), "varchar"));
+        map.addValue("eventsId", ArraySQLValue.create(user.getEventsId().toArray(), "bigint"));
+        return namedParameterJdbcTemplate.update(
                 "INSERT INTO users (userRole, name, secondName, patronymic, username, password, specialization, " +
-                        "rating, description, images, eventsid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                user.getUserRole().name(), user.getName(), user.getSecondName(), user.getPatronymic(),
-                user.getUsername(), user.getPassword(), user.getSpecialization().name(), user.getRating(),
-                user.getDescription(),
-                ArraySQLValue.create(user.getImages().toArray(), "varchar"),
-                ArraySQLValue.create(user.getEventsId().toArray(), "bigint")
-        );
+                        "rating, description, images, eventsid) VALUES " +
+                        "(:userRole, :name, :secondName, :patronymic, :userName, :password, :specialization, :rating," +
+                        " :description, :images, :eventsId)",
+                map);
     }
 
     public void updateImageHashes(long id, List<String> imageHashes){
-        jdbcTemplate.update("UPDATE users set images = images || ? where id = ?",
-                ArraySQLValue.create(imageHashes.toArray(), "varchar"), id);
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("id", id);
+        map.addValue("newImages", ArraySQLValue.create(imageHashes.toArray(), "varchar"));
+        namedParameterJdbcTemplate.update("UPDATE users set images = images || :newImages where id = :id", map);
     }
 }

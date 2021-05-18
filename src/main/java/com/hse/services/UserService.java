@@ -23,19 +23,19 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String login) {
-        User user = userDAO.getUserByUsername(login);
-        if (user == null) {
+        List<User> requestResult = userDAO.getUserByUsername(login);
+        if (requestResult.isEmpty()) {
             throw new UsernameNotFoundException("There is no user with this username.");
         }
-        return user;
+        return requestResult.get(0);
     }
 
     public User loadUserById(Long id) {
-        User user = userDAO.getUserById(id);
-        if (user == null) {
+        List<User> requestResult = userDAO.getUserById(id);
+        if (requestResult.isEmpty()) {
             throw new UsernameNotFoundException("There is no user with this username.");
         }
-        return user;
+        return requestResult.get(0);
     }
 
     public void saveUser(UserRegistrationData userRegistrationData) {
