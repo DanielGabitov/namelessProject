@@ -57,11 +57,11 @@ public class EventDAO {
                         " :rating, :geoData, :specialization, :date)", map);
     }
 
-    public void updateImageHashes(long id, List<String> imageHashes){
+    public void updateImageHashes(long id, List<String> imageUUIDs){
         MapSqlParameterSource map = new MapSqlParameterSource();
 
         map.addValue("id", id);
-        map.addValue("newImages", ArraySQLValue.create(imageHashes.toArray(), "varchar"));
+        map.addValue("newImages", ArraySQLValue.create(imageUUIDs.toArray(), "varchar"));
 
         namedJdbcTemplate.update("UPDATE events set images = images || :newImages where id = :id", map);
     }

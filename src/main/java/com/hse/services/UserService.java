@@ -3,7 +3,7 @@ package com.hse.services;
 import com.hse.DAOs.UserDAO;
 import com.hse.models.User;
 import com.hse.models.UserRegistrationData;
-import com.hse.utils.HashUtils;
+import com.hse.utils.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -44,11 +44,10 @@ public class UserService implements UserDetailsService {
 
         List<String> encodedImages = userRegistrationData.getImages();
         List<byte[]> images = ImageService.decodeImages(encodedImages);
-        ImageService.saveImagesToFileSystem(images);
-        List<String> imageHashes = HashUtils.hash(images);
-        user.setImages(imageHashes);
+        List<String> imageUUIDs = UUIDGenerator.generateList(images.size());
+        ImageService.saveImagesToFileSystem(images, imageUUIDs);
 
-        addImages(userId, imageHashes);
+        addImages(userId, imageUUIDs);
     }
 
     public void addImages(long id, List<String> imageHashes){

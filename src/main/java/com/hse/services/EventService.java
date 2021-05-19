@@ -4,7 +4,7 @@ import com.hse.DAOs.EventDAO;
 import com.hse.exceptions.ServiceException;
 import com.hse.models.Event;
 import com.hse.models.EventRegistrationData;
-import com.hse.utils.HashUtils;
+import com.hse.utils.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,10 +26,10 @@ public class EventService {
         // todo these lines appear in saveUser as well but Im not sure whether its a good idea to create 1 method for them
         List<String> encodedImages = eventRegistrationData.getImages();
         List<byte[]> images = ImageService.decodeImages(encodedImages);
-        ImageService.saveImagesToFileSystem(images);
-        List<String> imageHashes = HashUtils.hash(images);
+        List<String> imageUUIDs = UUIDGenerator.generateList(images.size());
+        ImageService.saveImagesToFileSystem(images, imageUUIDs);
 
-        addImages(eventId, imageHashes);
+        addImages(eventId, imageUUIDs);
     }
 
     public Event getEvent(long id) {
@@ -41,7 +41,7 @@ public class EventService {
     }
 
     //todo deleteImages
-    public void addImages(long id, List<String> imageHashes) {
-        eventDAO.updateImageHashes(id, imageHashes);
+    public void addImages(long id, List<String> imageUUIDs) {
+        eventDAO.updateImageHashes(id, imageUUIDs);
     }
 }

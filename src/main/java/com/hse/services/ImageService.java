@@ -7,9 +7,10 @@ import com.hse.models.ImageRegistrationData;
 import com.hse.models.User;
 import com.hse.systems.FileSystemInteractor;
 import com.hse.utils.Coder;
-import com.hse.utils.HashUtils;
+import com.hse.utils.UUIDGenerator;
 import org.springframework.stereotype.Component;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,16 +27,16 @@ public class ImageService {
 
     public void saveImages(ImageRegistrationData imageRegistrationData) {
         List<byte[]> images = ImageService.decodeImages(imageRegistrationData.getImages());
-        ImageService.saveImagesToFileSystem(images);
+        List<String> imageUUIDs = UUIDGenerator.generateList(images.size());
+        ImageService.saveImagesToFileSystem(images, imageUUIDs);
         long destinationId   = imageRegistrationData.getDestinationId();
         Entity destination   = imageRegistrationData.getDestination();
-        List<String> imageHashes = HashUtils.hash(images);
         switch (destination){
             case EVENT:
-                eventService.addImages(destinationId, imageHashes);
+                eventService.addImages(destinationId, imageUUIDs);
                 break;
             case USER:
-                userService.addImages(destinationId, imageHashes);
+                userService.addImages(destinationId, imageUUIDs);
                 break;
             default:
                 throw new ServiceException("Unknown entity " + destination.name());
@@ -69,15 +70,16 @@ public class ImageService {
         return images;
     }
 
-    public static void saveImagesToFileSystem(List<byte[]> images) {
-        for (byte[] image : images){
-            saveImageToFileSystem(image);
+    public static void saveImagesToFileSystem(List<byte[]> images, List<String> imageUIIDs) {
+        Iterator<byte[]> imageIterator = images.iterator();
+        Iterator<String> UUIDIterator  = imageUIIDs.iterator();
+        while (imageIterator.hasNext() && UUIDIterator.hasNext()){
+            saveImageToFileSystem(imageIterator.next(), UUIDIterator.next());
         }
     }
 
-    public static void saveImageToFileSystem(byte[] image) {
-        String imageHash = HashUtils.hash(image);
-        FileSystemInteractor.saveImage(image, imageHash);
+    public static void saveImageToFileSystem(byte[] image, String imageUIID) {
+        FileSystemInteractor.saveImage(image, imageUIID);
     }
 
     public static List<byte[]> decodeImages(List<String> encodedImages){
