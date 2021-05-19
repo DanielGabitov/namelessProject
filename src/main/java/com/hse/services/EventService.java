@@ -21,7 +21,7 @@ public class EventService {
 
     public void saveEvent(EventRegistrationData eventRegistrationData) {
         Event event = eventRegistrationData.getEvent();
-        int eventId = eventDAO.saveEvent(event);
+        long eventId = eventDAO.saveEvent(event);
 
         // todo these lines appear in saveUser as well but Im not sure whether its a good idea to create 1 method for them
         List<String> encodedImages = eventRegistrationData.getImages();

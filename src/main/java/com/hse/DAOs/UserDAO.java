@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class UserDAO {
         return namedParameterJdbcTemplate.query("SELECT * FROM users WHERE username=:userName", map, userMapper);
     }
 
-    public int saveUser(User user) {
+    public long saveUser(User user) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userRole", user.getUserRole().name());
         map.addValue("name", user.getName());
@@ -47,12 +48,16 @@ public class UserDAO {
         map.addValue("description", user.getDescription());
         map.addValue("images", ArraySQLValue.create(user.getImages().toArray(), "varchar"));
         map.addValue("eventsId", ArraySQLValue.create(user.getEventsId().toArray(), "bigint"));
-        return namedParameterJdbcTemplate.update(
-                "INSERT INTO users (userRole, name, secondName, patronymic, username, password, specialization, " +
-                        "rating, description, images, eventsid) VALUES " +
-                        "(:userRole, :name, :secondName, :patronymic, :userName, :password, :specialization, :rating," +
-                        " :description, :images, :eventsId)",
-                map);
+
+        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+
+        namedParameterJdbcTemplate.update(
+            "INSERT INTO users (userRole, name, secondName, patronymic, username, password, specialization, " +
+                "rating, description, images, eventsid) VALUES " +
+                "(:userRole, :name, :secondName, :patronymic, :userName, :password, :specialization, :rating," +
+                " :description, :images, :eventsId)", map, keyHolder
+        );
+        return (long) keyHolder.getKeyList().get(0).get("id");
     }
 
     public void updateImageHashes(long id, List<String> imageHashes){

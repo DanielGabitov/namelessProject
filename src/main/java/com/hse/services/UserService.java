@@ -40,7 +40,7 @@ public class UserService implements UserDetailsService {
 
     public void saveUser(UserRegistrationData userRegistrationData) {
         User user = userRegistrationData.getUser();
-        int userId = userDAO.saveUser(user);
+        long userId = userDAO.saveUser(user);
 
         List<String> encodedImages = userRegistrationData.getImages();
         List<byte[]> images = ImageService.decodeImages(encodedImages);

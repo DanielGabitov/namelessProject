@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class EventDAO {
         return namedJdbcTemplate.query("SELECT * FROM events WHERE id= :id", map, eventMapper);
     }
 
-    public int saveEvent(Event event) {
+    public long saveEvent(Event event) {
         MapSqlParameterSource map = new MapSqlParameterSource();
 
         map.addValue("name", event.getName());
@@ -49,12 +50,16 @@ public class EventDAO {
         map.addValue("specialization", event.getSpecialization().name());
         map.addValue("date", event.getDate());
 
-        return namedJdbcTemplate.update(
-                "INSERT INTO events" +
-                        "(name, description, images, organizerIDs, participantsIDs," +
-                        " rating, geoData, specialization, date)" +
-                        " VALUES (:name, :description , :images, :organizerIDs, :participantsIDs," +
-                        " :rating, :geoData, :specialization, :date)", map);
+        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+
+        namedJdbcTemplate.update(
+        "INSERT INTO events" +
+                "(name, description, images, organizerIDs, participantsIDs," +
+                " rating, geoData, specialization, date)" +
+                " VALUES (:name, :description , :images, :organizerIDs, :participantsIDs," +
+                " :rating, :geoData, :specialization, :date)", map, keyHolder
+        );
+        return (long) keyHolder.getKeyList().get(0).get("id");
     }
 
     public void updateImageHashes(long id, List<String> imageUUIDs){
