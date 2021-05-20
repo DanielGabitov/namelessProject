@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -31,5 +33,24 @@ public class UserController {
     public ResponseEntity<User> getUser(@PathVariable("id") Long userId) {
         User user = userService.loadUserById(userId);
         return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{userId}/likes")
+    public ResponseEntity<List<Long>> getLikes(@PathVariable("userId") long userId) {
+        return new ResponseEntity<>(userService.getLikes(userId), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/{userId}/likes/{eventId}")
+    public ResponseEntity<List<Long>> addLike(@PathVariable("userId") long userId,
+                                              @PathVariable("eventId") long eventId) {
+        userService.addLike(userId, eventId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/{userId}/likes/{eventId}")
+    public ResponseEntity<List<Long>> deleteLike(@PathVariable("userId") long userId,
+                                                 @PathVariable("eventId") long eventId) {
+        userService.deleteLike(userId, eventId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

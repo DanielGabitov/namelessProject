@@ -14,8 +14,8 @@ public class User implements UserDetails {
 
     private long id;
     private UserRole userRole;
-    private String name;
-    private String secondName;
+    private String firstName;
+    private String lastName;
     private String patronymic;
     private String username;
     private String password;
@@ -23,18 +23,17 @@ public class User implements UserDetails {
     private double rating;
     private String description;
     private List<String> images;
-    private List<Long> eventsId;
 
     public User() {
     }
 
-    public User(long id, UserRole userRole, String name, String secondName, String patronymic, String username,
+    public User(long id, UserRole userRole, String firstName, String lastName, String patronymic, String username,
                 String password, Specialization specialization, double rating, String description, List<String> images,
                 List<Long> eventsId) {
         this.id = id;
         this.userRole = userRole;
-        this.name = name;
-        this.secondName = secondName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.patronymic = patronymic;
         this.username = username;
         this.password = password;
@@ -42,7 +41,6 @@ public class User implements UserDetails {
         this.rating = rating;
         this.description = description;
         this.images = images;
-        this.eventsId = eventsId;
     }
 
     public long getId() {
@@ -61,20 +59,20 @@ public class User implements UserDetails {
         this.userRole = userRole;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getSecondName() {
-        return secondName;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setSecondName(String secondName) {
-        this.secondName = secondName;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getPatronymic() {
@@ -135,14 +133,6 @@ public class User implements UserDetails {
         this.images = images;
     }
 
-    public List<Long> getEventsId() {
-        return eventsId;
-    }
-
-    public void setEventsId(List<Long> eventsId) {
-        this.eventsId = eventsId;
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
@@ -173,12 +163,12 @@ public class User implements UserDetails {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id == user.id && Double.compare(user.rating, rating) == 0 && userRole == user.userRole && Objects.equals(name, user.name) && Objects.equals(secondName, user.secondName) && Objects.equals(patronymic, user.patronymic) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(specialization, user.specialization) && Objects.equals(description, user.description) && Objects.equals(images, user.images) && Objects.equals(eventsId, user.eventsId);
+        return id == user.id && Double.compare(user.rating, rating) == 0 && userRole == user.userRole && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(patronymic, user.patronymic) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(specialization, user.specialization) && Objects.equals(description, user.description) && Objects.equals(images, user.images);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userRole, name, secondName, patronymic, username, password, specialization, rating, description, images, eventsId);
+        return Objects.hash(id, userRole, firstName, lastName, patronymic, username, password, specialization, rating, description, images);
     }
 
     @Override
@@ -186,8 +176,8 @@ public class User implements UserDetails {
         return "{" +
                 "id=" + id +
                 ", userRole=" + userRole +
-                ", name='" + name + '\'' +
-                ", secondName='" + secondName + '\'' +
+                ", name='" + firstName + '\'' +
+                ", secondName='" + lastName + '\'' +
                 ", patronymic='" + patronymic + '\'' +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
@@ -195,7 +185,6 @@ public class User implements UserDetails {
                 ", rating=" + rating +
                 ", description='" + description + '\'' +
                 ", images=" + images +
-                ", eventsId=" + eventsId +
                 '}';
     }
 }

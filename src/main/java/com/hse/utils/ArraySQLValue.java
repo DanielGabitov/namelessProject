@@ -10,15 +10,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ArraySQLValue implements SqlValue {
     private final Object[] arr;
-    private final String   dbTypeName;
+    private final String dbTypeName;
+
+    private ArraySQLValue(final Object[] arr, final String dbTypeName) {
+        this.arr = checkNotNull(arr);
+        this.dbTypeName = checkNotNull(dbTypeName);
+    }
 
     public static ArraySQLValue create(final Object[] arr, final String dbTypeName) {
         return new ArraySQLValue(arr, dbTypeName);
-    }
-
-    private ArraySQLValue(final Object[] arr, final String dbTypeName) {
-        this.arr        = checkNotNull(arr);
-        this.dbTypeName = checkNotNull(dbTypeName);
     }
 
     @Override
@@ -28,5 +28,6 @@ public class ArraySQLValue implements SqlValue {
     }
 
     @Override
-    public void cleanup() {}
+    public void cleanup() {
+    }
 }

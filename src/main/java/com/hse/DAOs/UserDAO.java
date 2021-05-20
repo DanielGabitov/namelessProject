@@ -1,7 +1,6 @@
 package com.hse.DAOs;
 
 import com.hse.models.User;
-import com.hse.utils.ArraySQLValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -38,32 +37,22 @@ public class UserDAO {
     public long saveUser(User user) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userRole", user.getUserRole().name());
-        map.addValue("name", user.getName());
-        map.addValue("secondName", user.getSecondName());
+        map.addValue("firstName", user.getFirstName());
+        map.addValue("lastName", user.getLastName());
         map.addValue("patronymic", user.getPatronymic());
         map.addValue("userName", user.getUsername());
         map.addValue("password", user.getPassword());
         map.addValue("specialization", user.getSpecialization().name());
         map.addValue("rating", user.getRating());
         map.addValue("description", user.getDescription());
-        map.addValue("images", ArraySQLValue.create(user.getImages().toArray(), "varchar"));
-        map.addValue("eventsId", ArraySQLValue.create(user.getEventsId().toArray(), "bigint"));
-
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
 
         namedParameterJdbcTemplate.update(
-            "INSERT INTO users (userRole, name, secondName, patronymic, username, password, specialization, " +
-                "rating, description, images, eventsid) VALUES " +
-                "(:userRole, :name, :secondName, :patronymic, :userName, :password, :specialization, :rating," +
-                " :description, :images, :eventsId)", map, keyHolder
+                "INSERT INTO users (userRole, firstName, lastName, patronymic, username, password, specialization, " +
+                        "rating, description) VALUES " +
+                        "(:userRole, :firstName, :lastName, :patronymic, :userName, :password, :specialization, :rating," +
+                        " :description)", map, keyHolder
         );
         return (long) keyHolder.getKeyList().get(0).get("id");
-    }
-
-    public void updateImageHashes(long id, List<String> imageHashes){
-        MapSqlParameterSource map = new MapSqlParameterSource();
-        map.addValue("id", id);
-        map.addValue("newImages", ArraySQLValue.create(imageHashes.toArray(), "varchar"));
-        namedParameterJdbcTemplate.update("UPDATE users set images = images || :newImages where id = :id", map);
     }
 }

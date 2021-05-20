@@ -19,31 +19,12 @@ public class Event {
     private String geoData;
     private Specialization specialization;
     private Timestamp date;
+    private List<Long> likes;
 
     public Event() {
     }
 
-    //*
-//     {
-//     "name"            : "name",
-//     "description"     : "description",
-//     "imageHashes"     : ["hash#1, hash#2"],
-//     "organizerIDs"    : [1, 2],
-//     "participantsIDs" : [1, 2],
-//     "rating"          : 0.4,
-//     "geoData"         : "geoData",
-//     "specialization"  : "specialization",
-//     "date"            : "04-23-17 04:34:22"
-//     }
-    //
-    //
-    //
-    // *//
-
-    public Event(Long id, String name, String description,
-                 List<String> images, List<Long> organizerIDs, List<Long> participantsIDs, double rating,
-                 String geoData, Specialization specialization, Timestamp date) {
-
+    public Event(Long id, String name, String description, List<String> images, List<Long> organizerIDs, List<Long> participantsIDs, double rating, String geoData, Specialization specialization, Timestamp date, List<Long> likes) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -54,6 +35,7 @@ public class Event {
         this.geoData = geoData;
         this.specialization = specialization;
         this.date = date;
+        this.likes = likes;
     }
 
     public Long getId() {
@@ -136,17 +118,25 @@ public class Event {
         this.date = date;
     }
 
+    public List<Long> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Long> likes) {
+        this.likes = likes;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Event event = (Event) o;
-        return Double.compare(event.rating, rating) == 0 && Objects.equals(id, event.id) && Objects.equals(name, event.name) && Objects.equals(description, event.description) && Objects.equals(images, event.images) && Objects.equals(organizerIDs, event.organizerIDs) && Objects.equals(participantsIDs, event.participantsIDs) && Objects.equals(geoData, event.geoData) && specialization == event.specialization && Objects.equals(date, event.date);
+        return Double.compare(event.rating, rating) == 0 && Objects.equals(id, event.id) && Objects.equals(name, event.name) && Objects.equals(description, event.description) && Objects.equals(images, event.images) && Objects.equals(organizerIDs, event.organizerIDs) && Objects.equals(participantsIDs, event.participantsIDs) && Objects.equals(geoData, event.geoData) && specialization == event.specialization && Objects.equals(date, event.date) && Objects.equals(likes, event.likes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, images, organizerIDs, participantsIDs, rating, geoData, specialization, date);
+        return Objects.hash(id, name, description, images, organizerIDs, participantsIDs, rating, geoData, specialization, date, likes);
     }
 
     @Override
@@ -155,13 +145,14 @@ public class Event {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", imageHashes=" + images +
+                ", images=" + images +
                 ", organizerIDs=" + organizerIDs +
                 ", participantsIDs=" + participantsIDs +
                 ", rating=" + rating +
                 ", geoData='" + geoData + '\'' +
                 ", specialization=" + specialization +
                 ", date=" + date +
+                ", likes=" + likes +
                 '}';
     }
 }

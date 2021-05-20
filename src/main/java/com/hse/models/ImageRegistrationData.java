@@ -11,7 +11,8 @@ public class ImageRegistrationData {
     private List<String> images;
     private long destinationId;
 
-    public ImageRegistrationData() {}
+    public ImageRegistrationData() {
+    }
 
     public ImageRegistrationData(Entity destination, List<String> images, long destinationId) {
         this.destination = destination;

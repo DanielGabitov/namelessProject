@@ -20,18 +20,47 @@ public class ImageService {
     private final EventService eventService;
     private final UserService userService;
 
-    public ImageService(EventService eventService, UserService userService){
+    public ImageService(EventService eventService, UserService userService) {
         this.eventService = eventService;
-        this.userService  = userService;
+        this.userService = userService;
+    }
+
+    public static List<byte[]> loadImagesFromFileSystem(List<String> imageHashes) {
+        List<byte[]> images = new LinkedList<>();
+        for (String imageHash : imageHashes) {
+            byte[] image = FileSystemInteractor.getImage(imageHash);
+            images.add(image);
+        }
+        return images;
+    }
+
+    public static void saveImagesToFileSystem(List<byte[]> images, List<String> imageUIIDs) {
+        Iterator<byte[]> imageIterator = images.iterator();
+        Iterator<String> UUIDIterator = imageUIIDs.iterator();
+        while (imageIterator.hasNext() && UUIDIterator.hasNext()) {
+            saveImageToFileSystem(imageIterator.next(), UUIDIterator.next());
+        }
+    }
+
+    public static void saveImageToFileSystem(byte[] image, String imageUIID) {
+        FileSystemInteractor.saveImage(image, imageUIID);
+    }
+
+    public static List<byte[]> decodeImages(List<String> encodedImages) {
+        return encodedImages.stream().map(ImageService::decodeImage).collect(Collectors.toList());
+    }
+
+    public static byte[] decodeImage(String encodedImage) {
+        return Coder.decode(encodedImage);
     }
 
     public void saveImages(ImageRegistrationData imageRegistrationData) {
         List<byte[]> images = ImageService.decodeImages(imageRegistrationData.getImages());
         List<String> imageUUIDs = UUIDGenerator.generateList(images.size());
         ImageService.saveImagesToFileSystem(images, imageUUIDs);
-        long destinationId   = imageRegistrationData.getDestinationId();
-        Entity destination   = imageRegistrationData.getDestination();
-        switch (destination){
+        long destinationId = imageRegistrationData.getDestinationId();
+        Entity destination = imageRegistrationData.getDestination();
+        switch (destination) {
             case EVENT:
                 eventService.addImages(destinationId, imageUUIDs);
                 break;
@@ -43,9 +72,9 @@ public class ImageService {
         }
     }
 
-    public List<String> getImages(Long id, Entity source){
+    public List<String> getImages(Long id, Entity source) {
         List<String> imageHashes;
-        switch (source){
+        switch (source) {
             case EVENT:
                 Event event = eventService.getEvent(id);
                 imageHashes = event.getImages();
@@ -59,34 +88,5 @@ public class ImageService {
         }
         List<byte[]> images = loadImagesFromFileSystem(imageHashes);
         return images.stream().map(Coder::encode).collect(Collectors.toList());
-    }
-
-    public static List<byte[]> loadImagesFromFileSystem(List<String> imageHashes) {
-        List<byte[]> images = new LinkedList<>();
-        for (String imageHash : imageHashes){
-            byte[] image = FileSystemInteractor.getImage(imageHash);
-            images.add(image);
-        }
-        return images;
-    }
-
-    public static void saveImagesToFileSystem(List<byte[]> images, List<String> imageUIIDs) {
-        Iterator<byte[]> imageIterator = images.iterator();
-        Iterator<String> UUIDIterator  = imageUIIDs.iterator();
-        while (imageIterator.hasNext() && UUIDIterator.hasNext()){
-            saveImageToFileSystem(imageIterator.next(), UUIDIterator.next());
-        }
-    }
-
-    public static void saveImageToFileSystem(byte[] image, String imageUIID) {
-        FileSystemInteractor.saveImage(image, imageUIID);
-    }
-
-    public static List<byte[]> decodeImages(List<String> encodedImages){
-        return encodedImages.stream().map(ImageService::decodeImage).collect(Collectors.toList());
-    }
-
-    public static byte[] decodeImage(String encodedImage){
-        return Coder.decode(encodedImage);
     }
 }
