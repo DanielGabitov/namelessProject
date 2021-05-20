@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-//todo probably worth renaming
 public class UUIDGenerator {
 
     public static String generate() {
