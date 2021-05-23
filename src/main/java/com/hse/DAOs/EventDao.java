@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -48,5 +49,14 @@ public class EventDao {
                         " VALUES (:name, :description , :rating, :geoData, :specialization, :date)", map, keyHolder
         );
         return (long) keyHolder.getKeyList().get(0).get("id");
+    }
+
+    public List<Long> getEvents(int offset, int size){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("offset", offset);
+        map.addValue("size", size);
+
+        return namedJdbcTemplate.query("SELECT * FROM events OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY",
+                map, (resultSet, i) -> resultSet.getLong("id"));
     }
 }
