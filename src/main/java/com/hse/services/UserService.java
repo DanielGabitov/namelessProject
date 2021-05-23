@@ -64,11 +64,21 @@ public class UserService implements UserDetailsService {
     }
 
     public void addLike(long userId, long eventId) {
+        if (checkLike(userId, eventId)){
+            throw new ServiceException("Like already exists");
+        }
         likesDAO.addLike(userId, eventId);
     }
 
     public void deleteLike(long userId, long eventId) {
+        if (!checkLike(userId, eventId)){
+            throw new ServiceException("Like does not exists");
+        }
         likesDAO.deleteLike(userId, eventId);
+    }
+
+    public boolean checkLike(long userId, long eventId){
+        return likesDAO.checkLike(userId, eventId).isPresent();
     }
 
     public List<Event> getLikes(long userId) {

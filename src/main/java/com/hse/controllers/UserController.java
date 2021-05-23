@@ -50,8 +50,14 @@ public class UserController {
 
     @DeleteMapping(value = "/{userId}/likes/{eventId}")
     public ResponseEntity<String> deleteLike(@PathVariable("userId") long userId,
-                                                 @PathVariable("eventId") long eventId) {
+                                             @PathVariable("eventId") long eventId) {
         userService.deleteLike(userId, eventId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{userId}/likes/{eventId}")
+    public ResponseEntity<Boolean> checkLike(@PathVariable("userId") long userId,
+                                             @PathVariable("eventId") long eventId) {
+        return new ResponseEntity<>(userService.checkLike(userId, eventId), HttpStatus.OK);
     }
 }

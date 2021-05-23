@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class LikesDao {
@@ -17,12 +18,23 @@ public class LikesDao {
         this.namedJdbcTemplate = namedJdbcTemplate;
     }
 
+    //todo possible bug: can user put like many times?
     public void addLike(long userId, long eventId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);
         map.addValue("eventId", eventId);
 
         namedJdbcTemplate.update("INSERT INTO likes (userId, eventid) VALUES (:userId, :eventId)", map);
+    }
+
+    public Optional<Void> checkLike(long userId, long eventId) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("userId", userId);
+        map.addValue("eventId", eventId);
+
+        return namedJdbcTemplate.query(
+                "SELECT * FROM likes WHERE eventid = :eventId AND userId = :userId",
+                map, (resultSet, i) -> (Void) null).stream().findAny();
     }
 
     public void deleteLike(long userId, long eventId) {
