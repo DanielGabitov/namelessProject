@@ -8,30 +8,30 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Optional;
 
 @Component
-public class UserDAO {
+public class UserDao {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final RowMapper<User> userMapper;
 
     @Autowired
-    public UserDAO(NamedParameterJdbcTemplate namedParameterJdbcTemplate, RowMapper<User> userMapper) {
+    public UserDao(NamedParameterJdbcTemplate namedParameterJdbcTemplate, RowMapper<User> userMapper) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
         this.userMapper = userMapper;
     }
 
-    public List<User> getUserById(Long userId) throws IllegalArgumentException {
+    public Optional<User> getUserById(Long userId) throws IllegalArgumentException {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("id", userId);
-        return namedParameterJdbcTemplate.query("SELECT * FROM users WHERE id=:id", map, userMapper);
+        return namedParameterJdbcTemplate.query("SELECT * FROM users WHERE id=:id", map, userMapper).stream().findAny();
     }
 
-    public List<User> getUserByUsername(String userName) throws IllegalArgumentException {
+    public Optional<User> getUserByUsername(String userName) throws IllegalArgumentException {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userName", userName);
-        return namedParameterJdbcTemplate.query("SELECT * FROM users WHERE username=:userName", map, userMapper);
+        return namedParameterJdbcTemplate.query("SELECT * FROM users WHERE username=:userName", map, userMapper).stream().findAny();
     }
 
     public long saveUser(User user) {

@@ -1,65 +1,66 @@
 package com.hse.services;
 
-import com.hse.DAOs.LikesDAO;
-import com.hse.DAOs.UserDAO;
-import com.hse.DAOs.UserToImagesDAO;
+import com.hse.DAOs.EventDao;
+import com.hse.DAOs.LikesDao;
+import com.hse.DAOs.UserDao;
+import com.hse.DAOs.UserToImagesDao;
+import com.hse.exceptions.ServiceException;
+import com.hse.models.Event;
 import com.hse.models.User;
 import com.hse.models.UserRegistrationData;
-import com.hse.utils.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class UserService implements UserDetailsService {
-    private final UserDAO userDAO;
-    private final UserToImagesDAO userToImagesDAO;
-    private final LikesDAO likesDAO;
+    private final UserDao userDAO;
+    private final UserToImagesDao userToImagesDAO;
+    private final EventDao eventDao;
+    private final LikesDao likesDAO;
 
     @Autowired
-    public UserService(UserDAO userDAO, UserToImagesDAO userToImagesDAO, LikesDAO likesDAO) {
+    public UserService(UserDao userDAO, UserToImagesDao userToImagesDAO, LikesDao likesDAO, EventDao eventDao) {
         this.userDAO = userDAO;
         this.userToImagesDAO = userToImagesDAO;
         this.likesDAO = likesDAO;
+        this.eventDao = eventDao;
     }
 
     @Override
     public UserDetails loadUserByUsername(String login) {
-        List<User> requestResult = userDAO.getUserByUsername(login);
-        if (requestResult.isEmpty()) {
+        Optional<User> userOptional = userDAO.getUserByUsername(login);
+        if (userOptional.isEmpty()) {
             throw new UsernameNotFoundException("There is no user with this username.");
         }
-        return requestResult.get(0);
+        return userOptional.get();
     }
 
     public User loadUserById(Long id) {
-        List<User> requestResult = userDAO.getUserById(id);
-        if (requestResult.isEmpty()) {
+        Optional<User> userOptional = userDAO.getUserById(id);
+        if (userOptional.isEmpty()) {
             throw new UsernameNotFoundException("There is no user with this username.");
         }
-        return requestResult.get(0);
+        return userOptional.get();
     }
 
-    public void saveUser(UserRegistrationData userRegistrationData) {
+    @Transactional
+    public void createUser(UserRegistrationData userRegistrationData) {
         User user = readRegistrationData(userRegistrationData);
         long userId = userDAO.saveUser(user);
-
-        List<String> encodedImages = userRegistrationData.getImages();
-        List<byte[]> images = ImageService.decodeImages(encodedImages);
-        List<String> imageUUIDs = UUIDGenerator.generateList(images.size());
-        ImageService.saveImagesToFileSystem(images, imageUUIDs);
-
+        List<String> imageUUIDs = ImageService.saveImagesToFileSystem(userRegistrationData.getImages());
         addImages(userId, imageUUIDs);
     }
 
     public void addImages(long userId, List<String> imageUUIDs) {
-        for (String image : imageUUIDs) {
-            userToImagesDAO.addImage(userId, image);
-        }
+        imageUUIDs.forEach(UUID -> userToImagesDAO.addImage(userId, UUID));
     }
 
     public void addLike(long userId, long eventId) {
@@ -70,8 +71,16 @@ public class UserService implements UserDetailsService {
         likesDAO.deleteLike(userId, eventId);
     }
 
-    public List<Long> getLikes(long userId) {
-        return likesDAO.getUserLikes(userId);
+    public List<Event> getLikes(long userId) {
+        List<Event> list = new ArrayList<>();
+        for (Long eventId : likesDAO.getUserLikes(userId)) {
+            Optional<Event> optionalEvent = eventDao.getEvent(eventId);
+            if (optionalEvent.isEmpty()){
+                throw new ServiceException("Не существует Event с id" + eventId);
+            }
+            list.add(optionalEvent.get());
+        }
+        return list;
     }
 
     private User readRegistrationData(UserRegistrationData data){

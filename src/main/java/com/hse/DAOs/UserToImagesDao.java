@@ -4,14 +4,13 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class UserToImagesDAO {
+public class UserToImagesDao {
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
-    public UserToImagesDAO(NamedParameterJdbcTemplate namedJdbcTemplate) {
+    public UserToImagesDao(NamedParameterJdbcTemplate namedJdbcTemplate) {
         this.namedJdbcTemplate = namedJdbcTemplate;
     }
 
@@ -27,12 +26,6 @@ public class UserToImagesDAO {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);
         return namedJdbcTemplate.query("SELECT * from users_images WHERE userId = :userId", map,
-                resultSet -> {
-                    List<String> images = new ArrayList<>();
-                    while (resultSet.next()) {
-                        images.add(resultSet.getString("image"));
-                    }
-                    return images;
-                });
+                (resultSet, i) -> resultSet.getString("image"));
     }
 }

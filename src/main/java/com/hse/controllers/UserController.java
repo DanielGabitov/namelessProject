@@ -1,6 +1,7 @@
 package com.hse.controllers;
 
 import com.hse.exceptions.ServiceException;
+import com.hse.models.Event;
 import com.hse.models.User;
 import com.hse.models.UserRegistrationData;
 import com.hse.services.UserService;
@@ -25,7 +26,7 @@ public class UserController {
 
     @PostMapping(value = "", consumes = {"application/json"})
     public ResponseEntity<String> createUser(@RequestBody UserRegistrationData userRegistrationData) throws ServiceException {
-        userService.saveUser(userRegistrationData);
+        userService.createUser(userRegistrationData);
         return new ResponseEntity<>("User has been added.", HttpStatus.OK);
     }
 
@@ -36,19 +37,19 @@ public class UserController {
     }
 
     @GetMapping(value = "/{userId}/likes")
-    public ResponseEntity<List<Long>> getLikes(@PathVariable("userId") long userId) {
+    public ResponseEntity<List<Event>> getLikes(@PathVariable("userId") long userId) {
         return new ResponseEntity<>(userService.getLikes(userId), HttpStatus.OK);
     }
 
     @PostMapping(value = "/{userId}/likes/{eventId}")
-    public ResponseEntity<List<Long>> addLike(@PathVariable("userId") long userId,
+    public ResponseEntity<String> addLike(@PathVariable("userId") long userId,
                                               @PathVariable("eventId") long eventId) {
         userService.addLike(userId, eventId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{userId}/likes/{eventId}")
-    public ResponseEntity<List<Long>> deleteLike(@PathVariable("userId") long userId,
+    public ResponseEntity<String> deleteLike(@PathVariable("userId") long userId,
                                                  @PathVariable("eventId") long eventId) {
         userService.deleteLike(userId, eventId);
         return new ResponseEntity<>(HttpStatus.OK);

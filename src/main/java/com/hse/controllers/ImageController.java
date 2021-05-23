@@ -23,7 +23,7 @@ public class ImageController {
     }
 
     @PostMapping(value = "", consumes = {"application/json"})
-    public ResponseEntity<String> loadImages(@RequestBody ImageRegistrationData imageRegistrationData) {
+    public ResponseEntity<String> saveImages(@RequestBody ImageRegistrationData imageRegistrationData) {
         imageService.saveImages(imageRegistrationData);
         return new ResponseEntity<>(HttpStatus.OK);
     }

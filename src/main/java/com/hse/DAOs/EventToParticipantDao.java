@@ -5,16 +5,15 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class EventToParticipantDAO {
+public class EventToParticipantDao {
 
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     @Autowired
-    public EventToParticipantDAO(NamedParameterJdbcTemplate namedJdbcTemplate) {
+    public EventToParticipantDao(NamedParameterJdbcTemplate namedJdbcTemplate) {
         this.namedJdbcTemplate = namedJdbcTemplate;
     }
 
@@ -31,12 +30,6 @@ public class EventToParticipantDAO {
         map.addValue("eventId", eventId);
 
         return namedJdbcTemplate.query("SELECT * from events_participants WHERE eventId = :eventId", map,
-                resultSet -> {
-                    List<Long> participants = new ArrayList<>();
-                    while (resultSet.next()) {
-                        participants.add(resultSet.getLong("userId"));
-                    }
-                    return participants;
-                });
+                (resultSet, i) -> resultSet.getLong("userId"));
     }
 }

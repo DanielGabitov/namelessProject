@@ -22,7 +22,7 @@ public class UserMapper implements RowMapper<User> {
         user.setUsername(resultSet.getString("username"));
         user.setPassword(resultSet.getString("password"));
         user.setSpecialization(Specialization.valueOf(resultSet.getString("specialization")));
-        user.setRating(resultSet.getDouble("rating"));
+        user.setRating(resultSet.getFloat("rating"));
         user.setDescription(resultSet.getString("description"));
         return user;
     }

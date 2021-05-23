@@ -4,24 +4,25 @@ import com.hse.DAOs.*;
 import com.hse.exceptions.ServiceException;
 import com.hse.models.Event;
 import com.hse.models.EventRegistrationData;
-import com.hse.utils.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class EventService {
-    private final EventDAO eventDAO;
-    private final EventToOrganizerDAO eventToOrganizerDAO;
-    private final EventToParticipantDAO eventToParticipantDAO;
-    private final EventToImagesDAO eventToImagesDAO;
-    private final LikesDAO likesDAO;
+    private final EventDao eventDAO;
+    private final EventToOrganizerDao eventToOrganizerDAO;
+    private final EventToParticipantDao eventToParticipantDAO;
+    private final EventToImagesDao eventToImagesDAO;
+    private final LikesDao likesDAO;
 
     @Autowired
-    public EventService(EventDAO eventDAO, EventToOrganizerDAO eventToOrganizerDAO,
-                        EventToParticipantDAO eventToParticipantDAO, EventToImagesDAO eventToImagesDAO,
-                        LikesDAO likesDao) {
+    public EventService(EventDao eventDAO, EventToOrganizerDao eventToOrganizerDAO,
+                        EventToParticipantDao eventToParticipantDAO, EventToImagesDao eventToImagesDAO,
+                        LikesDao likesDao) {
 
         this.eventDAO = eventDAO;
         this.eventToOrganizerDAO = eventToOrganizerDAO;
@@ -30,27 +31,23 @@ public class EventService {
         this.likesDAO = likesDao;
     }
 
-    public void saveEvent(EventRegistrationData eventRegistrationData) {
+    @Transactional
+    public void createEvent(EventRegistrationData eventRegistrationData) {
         Event event  = readRegistrationData(eventRegistrationData);
-        long eventId = eventDAO.saveEvent(event);
+        long eventId = eventDAO.createEvent(event);
         addParticipants(eventId, event.getParticipantsIDs());
         addOrganizers(eventId, event.getOrganizerIDs());
-
-        // todo these lines appear in saveUser as well but Im not sure whether its a good idea to create 1 method for them
-        List<String> encodedImages = eventRegistrationData.getImages();
-        List<byte[]> images = ImageService.decodeImages(encodedImages);
-        List<String> imageUUIDs = UUIDGenerator.generateList(images.size());
-        ImageService.saveImagesToFileSystem(images, imageUUIDs);
-
+        List<String> imageUUIDs = ImageService.saveImagesToFileSystem(eventRegistrationData.getImages());
         addImages(eventId, imageUUIDs);
     }
 
+    @Transactional
     public Event getEvent(long id) {
-        List<Event> eventList = eventDAO.getEvent(id);
-        if (eventList.isEmpty()) {
+        Optional<Event> optionalEvent = eventDAO.getEvent(id);
+        if (optionalEvent.isEmpty()) {
             throw new ServiceException("Failed to find event with given ID.");
         }
-        Event event = eventList.get(0);
+        Event event = optionalEvent.get();
         event.setParticipantsIDs(getParticipants(id));
         event.setOrganizerIDs(getOrganizers(id));
         event.setImages(getImages(id));
@@ -59,9 +56,7 @@ public class EventService {
     }
 
     public void addParticipants(long eventId, List<Long> participants) {
-        for (Long participant : participants) {
-            eventToParticipantDAO.addParticipant(eventId, participant);
-        }
+        participants.forEach(participant -> eventToParticipantDAO.addParticipant(eventId, participant));
     }
 
     public List<Long> getParticipants(long eventId) {
@@ -69,9 +64,7 @@ public class EventService {
     }
 
     public void addOrganizers(long eventId, List<Long> organizers) {
-        for (Long organizer : organizers) {
-            eventToOrganizerDAO.addOrganizer(eventId, organizer);
-        }
+        organizers.forEach(organizer -> eventToOrganizerDAO.addOrganizer(eventId, organizer));
     }
 
     public List<Long> getOrganizers(long eventId) {
@@ -79,9 +72,7 @@ public class EventService {
     }
 
     public void addImages(long eventId, List<String> imageUUIDs) {
-        for (String image : imageUUIDs) {
-            eventToImagesDAO.addImage(eventId, image);
-        }
+        imageUUIDs.forEach(image -> eventToImagesDAO.addImage(eventId, image));
     }
 
     public List<String> getImages(long eventId) {

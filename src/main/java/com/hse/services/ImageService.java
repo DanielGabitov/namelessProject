@@ -10,9 +10,8 @@ import com.hse.utils.Coder;
 import com.hse.utils.UUIDGenerator;
 import org.springframework.stereotype.Component;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -25,21 +24,18 @@ public class ImageService {
         this.userService = userService;
     }
 
-    public static List<byte[]> loadImagesFromFileSystem(List<String> imageHashes) {
-        List<byte[]> images = new LinkedList<>();
-        for (String imageHash : imageHashes) {
-            byte[] image = FileSystemInteractor.getImage(imageHash);
-            images.add(image);
-        }
-        return images;
+    public static List<byte[]> loadImagesFromFileSystem(List<String> imageUUIDs) {
+        return imageUUIDs.stream().map(FileSystemInteractor::getImage).collect(Collectors.toList());
     }
 
-    public static void saveImagesToFileSystem(List<byte[]> images, List<String> imageUIIDs) {
-        Iterator<byte[]> imageIterator = images.iterator();
-        Iterator<String> UUIDIterator = imageUIIDs.iterator();
-        while (imageIterator.hasNext() && UUIDIterator.hasNext()) {
-            saveImageToFileSystem(imageIterator.next(), UUIDIterator.next());
-        }
+    // returns UUIDs of saved images
+    public static List<String> saveImagesToFileSystem(List<String> encodedImages) {
+        List<Map.Entry<byte[], String>> images = encodedImages.stream()
+                .map(image -> Map.entry(decodeImage(image), UUIDGenerator.generate()))
+                .collect(Collectors.toList());
+
+        images.forEach(entry -> saveImageToFileSystem(entry.getKey(), entry.getValue()));
+        return images.stream().map(Map.Entry::getValue).collect(Collectors.toList());
     }
 
     public static void saveImageToFileSystem(byte[] image, String imageUIID) {
@@ -55,9 +51,7 @@ public class ImageService {
     }
 
     public void saveImages(ImageRegistrationData imageRegistrationData) {
-        List<byte[]> images = ImageService.decodeImages(imageRegistrationData.getImages());
-        List<String> imageUUIDs = UUIDGenerator.generateList(images.size());
-        ImageService.saveImagesToFileSystem(images, imageUUIDs);
+        List<String> imageUUIDs = ImageService.saveImagesToFileSystem(imageRegistrationData.getImages());
         long destinationId = imageRegistrationData.getDestinationId();
         Entity destination = imageRegistrationData.getDestination();
         switch (destination) {

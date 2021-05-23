@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class LikesDAO {
+public class LikesDao {
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     @Autowired
-    public LikesDAO(NamedParameterJdbcTemplate namedJdbcTemplate) {
+    public LikesDao(NamedParameterJdbcTemplate namedJdbcTemplate) {
         this.namedJdbcTemplate = namedJdbcTemplate;
     }
 
@@ -53,12 +53,6 @@ public class LikesDAO {
         map.addValue("userId", userId);
 
         return namedJdbcTemplate.query("SELECT * from likes WHERE userId = :userId", map,
-                resultSet -> {
-                    List<Long> events = new ArrayList<>();
-                    while (resultSet.next()) {
-                        events.add(resultSet.getLong("userId"));
-                    }
-                    return events;
-                });
+                (resultSet, i) -> resultSet.getLong("userId"));
     }
 }

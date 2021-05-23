@@ -8,29 +8,29 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Optional;
 
 @Component
-public class EventDAO {
+public class EventDao {
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     private final RowMapper<Event> eventMapper;
 
     @Autowired
-    public EventDAO(NamedParameterJdbcTemplate namedJdbcTemplate, RowMapper<Event> eventMapper) {
+    public EventDao(NamedParameterJdbcTemplate namedJdbcTemplate, RowMapper<Event> eventMapper) {
         this.namedJdbcTemplate = namedJdbcTemplate;
         this.eventMapper = eventMapper;
     }
 
 
-    public List<Event> getEvent(long id) {
+    public Optional<Event> getEvent(long id) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("id", id);
-        return namedJdbcTemplate.query("SELECT * FROM events WHERE id= :id", map, eventMapper);
+        return namedJdbcTemplate.query("SELECT * FROM events WHERE id= :id", map, eventMapper).stream().findAny();
     }
 
 
-    public long saveEvent(Event event) {
+    public long createEvent(Event event) {
         MapSqlParameterSource map = new MapSqlParameterSource();
 
         map.addValue("name", event.getName());
@@ -47,7 +47,6 @@ public class EventDAO {
                         "(name, description, rating, geoData, specialization, date)" +
                         " VALUES (:name, :description , :rating, :geoData, :specialization, :date)", map, keyHolder
         );
-
         return (long) keyHolder.getKeyList().get(0).get("id");
     }
 }

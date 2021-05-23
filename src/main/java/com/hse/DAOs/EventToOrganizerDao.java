@@ -4,14 +4,13 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class EventToOrganizerDAO {
+public class EventToOrganizerDao {
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
-    public EventToOrganizerDAO(NamedParameterJdbcTemplate namedJdbcTemplate) {
+    public EventToOrganizerDao(NamedParameterJdbcTemplate namedJdbcTemplate) {
         this.namedJdbcTemplate = namedJdbcTemplate;
     }
 
@@ -28,12 +27,6 @@ public class EventToOrganizerDAO {
         map.addValue("eventId", eventId);
 
         return namedJdbcTemplate.query("SELECT * from events_organizers WHERE eventId = :eventId", map,
-                resultSet -> {
-                    List<Long> organizers = new ArrayList<>();
-                    while (resultSet.next()) {
-                        organizers.add(resultSet.getLong("userId"));
-                    }
-                    return organizers;
-                });
+                (resultSet, i) -> resultSet.getLong("userId"));
     }
 }

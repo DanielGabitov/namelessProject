@@ -1,23 +1,13 @@
 package com.hse.exceptions;
 
-public class ServiceException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
-    public ServiceException() {
-    }
+
+//todo разобраться с Exception'ами и кодами возврата
+public class ServiceException extends ResponseStatusException {
 
     public ServiceException(String message) {
-        super(message);
-    }
-
-    public ServiceException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ServiceException(Throwable cause) {
-        super(cause);
-    }
-
-    public ServiceException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        super(HttpStatus.INTERNAL_SERVER_ERROR, message);
     }
 }

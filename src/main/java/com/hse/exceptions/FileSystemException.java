@@ -1,23 +1,11 @@
 package com.hse.exceptions;
 
-public class FileSystemException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
-    public FileSystemException() {
-    }
-
-    public FileSystemException(String message) {
-        super(message);
-    }
+public class FileSystemException extends ResponseStatusException {
 
     public FileSystemException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public FileSystemException(Throwable cause) {
-        super(cause);
-    }
-
-    public FileSystemException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        super(HttpStatus.INTERNAL_SERVER_ERROR, message, cause);
     }
 }
