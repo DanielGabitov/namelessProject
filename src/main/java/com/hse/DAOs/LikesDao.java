@@ -18,7 +18,6 @@ public class LikesDao {
         this.namedJdbcTemplate = namedJdbcTemplate;
     }
 
-    //todo possible bug: can user put like many times?
     public void addLike(long userId, long eventId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);

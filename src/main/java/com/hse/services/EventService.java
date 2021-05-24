@@ -4,12 +4,15 @@ import com.hse.DAOs.*;
 import com.hse.exceptions.ServiceException;
 import com.hse.models.Event;
 import com.hse.models.EventRegistrationData;
+import com.hse.systems.FileSystemInteractor;
+import com.hse.utils.Coder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class EventService {
@@ -76,7 +79,10 @@ public class EventService {
     }
 
     public List<String> getImages(long eventId) {
-        return eventToImagesDAO.getImages(eventId);
+        return eventToImagesDAO.getImages(eventId).stream()
+                .map(FileSystemInteractor::getImage)
+                .map(Coder::encode)
+                .collect(Collectors.toList());
     }
 
     public List<Long> getLikes(long eventId) {

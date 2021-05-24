@@ -23,8 +23,8 @@ public class FileSystemInteractor {
         }
     }
 
-    public static byte[] getImage(String imageHash) {
-        File imageFile = IMAGE_DIRECTORY.resolve(imageHash).toFile();
+    public static byte[] getImage(String imageUUID) {
+        File imageFile = IMAGE_DIRECTORY.resolve(imageUUID).toFile();
         try {
             return FileUtils.readFileToByteArray(imageFile);
         } catch (IOException e) {
