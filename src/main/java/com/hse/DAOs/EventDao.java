@@ -51,7 +51,7 @@ public class EventDao {
         return (long) keyHolder.getKeyList().get(0).get("id");
     }
 
-    public List<Long> getEvents(int offset, int size){
+    public List<Long> getEvents(int offset, int size) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("offset", offset);
         map.addValue("size", size);

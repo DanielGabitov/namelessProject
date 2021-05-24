@@ -35,12 +35,14 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String login) {
-        Optional<User> userOptional = userDAO.getUserByUsername(login);
-        if (userOptional.isEmpty()) {
-            throw new UsernameNotFoundException("There is no user with this username.");
-        }
-        return userOptional.get();
+    public UserDetails loadUserByUsername(String username) {
+        return userDAO.getUserByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("There is no user with this username."));
+    }
+
+    public User loadUserByUsernameAndPassword(String username, String password) {
+        return userDAO.getUserByUsernameAndPassword(username, password)
+                .orElseThrow(() -> new UsernameNotFoundException("There is no user with this username and password."));
     }
 
     public User loadUserById(Long id) {
@@ -64,20 +66,20 @@ public class UserService implements UserDetailsService {
     }
 
     public void addLike(long userId, long eventId) {
-        if (checkLike(userId, eventId)){
+        if (checkLike(userId, eventId)) {
             throw new ServiceException("Like already exists");
         }
         likesDAO.addLike(userId, eventId);
     }
 
     public void removeLike(long userId, long eventId) {
-        if (!checkLike(userId, eventId)){
+        if (!checkLike(userId, eventId)) {
             throw new ServiceException("Like does not exists");
         }
         likesDAO.removeLike(userId, eventId);
     }
 
-    public boolean checkLike(long userId, long eventId){
+    public boolean checkLike(long userId, long eventId) {
         return likesDAO.checkLike(userId, eventId).isPresent();
     }
 
@@ -85,7 +87,7 @@ public class UserService implements UserDetailsService {
         List<Event> list = new ArrayList<>();
         for (Long eventId : likesDAO.getUserLikes(userId)) {
             Optional<Event> optionalEvent = eventDao.getEvent(eventId);
-            if (optionalEvent.isEmpty()){
+            if (optionalEvent.isEmpty()) {
                 throw new ServiceException("Не существует Event с id" + eventId);
             }
             list.add(optionalEvent.get());
@@ -93,7 +95,7 @@ public class UserService implements UserDetailsService {
         return list;
     }
 
-    private User readRegistrationData(UserRegistrationData data){
+    private User readRegistrationData(UserRegistrationData data) {
         User user = new User();
         user.setUserRole(data.getUserRole());
         user.setFirstName(data.getFirstName());
@@ -106,7 +108,7 @@ public class UserService implements UserDetailsService {
         user.setDescription(data.getDescription());
 
         user.setImages(List.of());
-        
+
         return user;
     }
 }

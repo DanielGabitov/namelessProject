@@ -36,7 +36,7 @@ public class EventService {
 
     @Transactional
     public void createEvent(EventRegistrationData eventRegistrationData) {
-        Event event  = readRegistrationData(eventRegistrationData);
+        Event event = readRegistrationData(eventRegistrationData);
         long eventId = eventDAO.createEvent(event);
         addParticipants(eventId, event.getParticipantsIDs());
         addOrganizers(eventId, event.getOrganizerIDs());
@@ -89,7 +89,7 @@ public class EventService {
         return likesDAO.getEventLikes(eventId);
     }
 
-    private Event readRegistrationData(EventRegistrationData data){
+    private Event readRegistrationData(EventRegistrationData data) {
         Event event = new Event();
         event.setName(data.getName());
         event.setDescription(data.getDescription());

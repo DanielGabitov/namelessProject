@@ -21,6 +21,7 @@
         <lombok.version>1.18.20</lombok.version>
         <flyway-maven-plugin.version>4.0.3</flyway-maven-plugin.version>
         <spring-boot-starter-parent.version>2.3.10.RELEASE</spring-boot-starter-parent.version>
+        <io.jsonwebtoken>0.11.2</io.jsonwebtoken>
 
 
     </properties>
@@ -142,6 +143,27 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit-jupiter-engine.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${io.jsonwebtoken}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${io.jsonwebtoken}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${io.jsonwebtoken}</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 </project>

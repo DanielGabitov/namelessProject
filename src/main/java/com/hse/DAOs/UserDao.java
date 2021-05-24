@@ -28,10 +28,17 @@ public class UserDao {
         return namedParameterJdbcTemplate.query("SELECT * FROM users WHERE id=:id", map, userMapper).stream().findAny();
     }
 
-    public Optional<User> getUserByUsername(String userName) throws IllegalArgumentException {
+    public Optional<User> getUserByUsername(String username) throws IllegalArgumentException {
         MapSqlParameterSource map = new MapSqlParameterSource();
-        map.addValue("userName", userName);
-        return namedParameterJdbcTemplate.query("SELECT * FROM users WHERE username=:userName", map, userMapper).stream().findAny();
+        map.addValue("username", username);
+        return namedParameterJdbcTemplate.query("SELECT * FROM users WHERE username=:username", map, userMapper).stream().findAny();
+    }
+
+    public Optional<User> getUserByUsernameAndPassword(String username, String password) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("username", username);
+        map.addValue("password", password);
+        return namedParameterJdbcTemplate.query("SELECT * FROM users WHERE username=:username AND password=:password", map, userMapper).stream().findAny();
     }
 
     public long saveUser(User user) {
