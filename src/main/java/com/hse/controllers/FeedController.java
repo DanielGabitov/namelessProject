@@ -2,6 +2,7 @@ package com.hse.controllers;
 
 import com.hse.models.Event;
 import com.hse.services.FeedService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ public class FeedController {
     }
 
     @GetMapping(consumes = {"application/json"})
+    @ApiOperation(value = "", nickname = "Get events for feed", tags = { "Feed" })
     public List<Event> getEvents(@RequestParam("offset") int offset, @RequestParam("size") int size){
         return feedService.getEvents(offset, size);
     }

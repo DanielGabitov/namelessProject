@@ -36,7 +36,7 @@ public class LikesDao {
                 map, (resultSet, i) -> (Void) null).stream().findAny();
     }
 
-    public void deleteLike(long userId, long eventId) {
+    public void removeLike(long userId, long eventId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);
         map.addValue("eventId", eventId);
