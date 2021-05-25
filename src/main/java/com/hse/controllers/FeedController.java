@@ -18,13 +18,13 @@ public class FeedController {
     private final FeedService feedService;
 
     @Autowired
-    private FeedController(FeedService feedService){
+    private FeedController(FeedService feedService) {
         this.feedService = feedService;
     }
 
     @GetMapping(consumes = {"application/json"})
-    @ApiOperation(value = "", nickname = "Get events for feed", tags = { "Feed" })
-    public List<Event> getEvents(@RequestParam("offset") int offset, @RequestParam("size") int size){
+    @ApiOperation(value = "", nickname = "Get events for feed", tags = {"Feed"})
+    public List<Event> getEvents(@RequestParam("offset") int offset, @RequestParam("size") int size) {
         return feedService.getEvents(offset, size);
     }
 }

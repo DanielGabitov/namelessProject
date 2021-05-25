@@ -22,11 +22,11 @@ public class EventController {
         this.eventService = eventService;
     }
 
-    @PostMapping (consumes = {"application/json"})
-    @ApiOperation(value = "", nickname = "Create new event.", tags = { "Events" })
+    @PostMapping(consumes = {"application/json"})
+    @ApiOperation(value = "", nickname = "Create new event.", tags = {"Events"})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Internal serverError") }
+            @ApiResponse(code = 404, message = "Internal serverError")}
     )
     public ResponseEntity<String> createEvent(@RequestBody EventRegistrationData eventRegistrationData) {
         eventService.createEvent(eventRegistrationData);
@@ -34,10 +34,10 @@ public class EventController {
     }
 
     @GetMapping(value = "/{id}", produces = {"application/json"})
-    @ApiOperation(value = "", nickname = "Get event.", tags = { "Events" })
+    @ApiOperation(value = "", nickname = "Get event.", tags = {"Events"})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Internal serverError") }
+            @ApiResponse(code = 404, message = "Internal serverError")}
     )
     public ResponseEntity<Event> getEvent(@PathVariable("id") long id) {
         Event event = eventService.getEvent(id);

@@ -13,12 +13,12 @@ public class FeedService {
     private final EventDao eventDao;
     private final EventService eventService;
 
-    public FeedService(EventDao eventDao, EventService eventService){
+    public FeedService(EventDao eventDao, EventService eventService) {
         this.eventDao = eventDao;
         this.eventService = eventService;
     }
 
-    public List<Event> getEvents(int offset, int size){
+    public List<Event> getEvents(int offset, int size) {
         List<Long> eventIds = eventDao.getEvents(offset, size);
         return eventIds.stream().map(eventService::getEvent).collect(Collectors.toList());
     }

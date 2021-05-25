@@ -26,35 +26,35 @@ public class UserController {
     }
 
     @PostMapping(value = "", consumes = {"application/json"})
-    @ApiOperation(value = "", nickname = "Create new user.", tags = { "User" })
+    @ApiOperation(value = "", nickname = "Create new user.", tags = {"User"})
     public ResponseEntity<String> createUser(@RequestBody UserRegistrationData userRegistrationData) throws ServiceException {
         userService.createUser(userRegistrationData);
         return new ResponseEntity<>("User has been added.", HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}", produces = {"application/json"})
-    @ApiOperation(value = "", nickname = "Get new user.", tags = { "User" })
+    @ApiOperation(value = "", nickname = "Get new user.", tags = {"User"})
     public ResponseEntity<User> getUser(@PathVariable("id") Long userId) {
         User user = userService.loadUserById(userId);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{userId}/likes")
-    @ApiOperation(value = "", nickname = "Get list of Events, that user with given userId liked.", tags = { "User" })
+    @ApiOperation(value = "", nickname = "Get list of Events, that user with given userId liked.", tags = {"User"})
     public ResponseEntity<List<Event>> getLikes(@PathVariable("userId") long userId) {
         return new ResponseEntity<>(userService.getLikes(userId), HttpStatus.OK);
     }
 
     @PostMapping(value = "/{userId}/likes/{eventId}")
-    @ApiOperation(value = "", nickname = "Add like.", tags = { "User" })
+    @ApiOperation(value = "", nickname = "Add like.", tags = {"User"})
     public ResponseEntity<String> addLike(@PathVariable("userId") long userId,
-                                              @PathVariable("eventId") long eventId) {
+                                          @PathVariable("eventId") long eventId) {
         userService.addLike(userId, eventId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{userId}/likes/{eventId}")
-    @ApiOperation(value = "", nickname = "Remove like.", tags = { "User" })
+    @ApiOperation(value = "", nickname = "Remove like.", tags = {"User"})
     public ResponseEntity<String> removeLike(@PathVariable("userId") long userId,
                                              @PathVariable("eventId") long eventId) {
         userService.removeLike(userId, eventId);
@@ -62,7 +62,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{userId}/likes/{eventId}")
-    @ApiOperation(value = "", nickname = "Check if user liked event.", tags = { "User" })
+    @ApiOperation(value = "", nickname = "Check if user liked event.", tags = {"User"})
     public ResponseEntity<Boolean> checkLike(@PathVariable("userId") long userId,
                                              @PathVariable("eventId") long eventId) {
         return new ResponseEntity<>(userService.checkLike(userId, eventId), HttpStatus.OK);
