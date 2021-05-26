@@ -1,6 +1,7 @@
 package com.hse.controllers;
 
 import com.hse.models.Event;
+import com.hse.models.User;
 import com.hse.services.FeedService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,15 @@ public class FeedController {
         this.feedService = feedService;
     }
 
-    @GetMapping(consumes = {"application/json"})
-    @ApiOperation(value = "", nickname = "Get events for feed", tags = {"Feed"})
+    @GetMapping(value = "/events", consumes = {"application/json"})
+    @ApiOperation(value = "/events", nickname = "Get events for feed", tags = {"Feed"})
     public List<Event> getEvents(@RequestParam("offset") int offset, @RequestParam("size") int size) {
         return feedService.getEvents(offset, size);
+    }
+
+    @GetMapping(value = "/creators", consumes = {"application/json"})
+    @ApiOperation(value = "/creators", nickname = "Get creators for feed", tags = {"Feed"})
+    public List<User> getCreators(@RequestParam("offset") int offset, @RequestParam("size") int size) {
+        return feedService.getCreators(offset, size);
     }
 }

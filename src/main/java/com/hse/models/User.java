@@ -2,6 +2,7 @@ package com.hse.models;
 
 import com.hse.enums.Specialization;
 import com.hse.enums.UserRole;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class User implements UserDetails {
 
     private long id;

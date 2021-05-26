@@ -25,13 +25,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(value = "", consumes = {"application/json"})
-    @ApiOperation(value = "", nickname = "Create new user.", tags = {"User"})
-    public ResponseEntity<String> createUser(@RequestBody UserRegistrationData userRegistrationData) throws ServiceException {
-        userService.createUser(userRegistrationData);
-        return new ResponseEntity<>("User has been added.", HttpStatus.OK);
-    }
-
     @GetMapping(value = "/{id}", produces = {"application/json"})
     @ApiOperation(value = "", nickname = "Get new user.", tags = {"User"})
     public ResponseEntity<User> getUser(@PathVariable("id") Long userId) {

@@ -8,37 +8,38 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
 public class UserDao {
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     private final RowMapper<User> userMapper;
 
     @Autowired
-    public UserDao(NamedParameterJdbcTemplate namedParameterJdbcTemplate, RowMapper<User> userMapper) {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+    public UserDao(NamedParameterJdbcTemplate namedJdbcTemplate, RowMapper<User> userMapper) {
+        this.namedJdbcTemplate = namedJdbcTemplate;
         this.userMapper = userMapper;
     }
 
     public Optional<User> getUserById(Long userId) throws IllegalArgumentException {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("id", userId);
-        return namedParameterJdbcTemplate.query("SELECT * FROM users WHERE id=:id", map, userMapper).stream().findAny();
+        return namedJdbcTemplate.query("SELECT * FROM users WHERE id=:id", map, userMapper).stream().findAny();
     }
 
     public Optional<User> getUserByUsername(String username) throws IllegalArgumentException {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("username", username);
-        return namedParameterJdbcTemplate.query("SELECT * FROM users WHERE username=:username", map, userMapper).stream().findAny();
+        return namedJdbcTemplate.query("SELECT * FROM users WHERE username=:username", map, userMapper).stream().findAny();
     }
 
     public Optional<User> getUserByUsernameAndPassword(String username, String password) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("username", username);
         map.addValue("password", password);
-        return namedParameterJdbcTemplate.query("SELECT * FROM users WHERE username=:username AND password=:password", map, userMapper).stream().findAny();
+        return namedJdbcTemplate.query("SELECT * FROM users WHERE username=:username AND password=:password", map, userMapper).stream().findAny();
     }
 
     public long saveUser(User user) {
@@ -54,12 +55,22 @@ public class UserDao {
         map.addValue("description", user.getDescription());
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
 
-        namedParameterJdbcTemplate.update(
+        namedJdbcTemplate.update(
                 "INSERT INTO users (userRole, firstName, lastName, patronymic, username, password, specialization, " +
                         "rating, description) VALUES " +
                         "(:userRole, :firstName, :lastName, :patronymic, :userName, :password, :specialization, :rating," +
                         " :description)", map, keyHolder
         );
         return (long) keyHolder.getKeyList().get(0).get("id");
+    }
+
+    public List<Long> getCreators(int offset, int size){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("offset", offset);
+        map.addValue("size", size);
+
+        return namedJdbcTemplate.query("SELECT * FROM users WHERE userRole = 'CREATOR'" +
+                        " OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY;",
+                map, (resultSet, i) -> resultSet.getLong("id"));
     }
 }
