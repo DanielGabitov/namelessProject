@@ -8,6 +8,8 @@ import com.hse.exceptions.ServiceException;
 import com.hse.models.Event;
 import com.hse.models.User;
 import com.hse.models.UserRegistrationData;
+import com.hse.systems.FileSystemInteractor;
+import com.hse.utils.Coder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class UserService implements UserDetailsService {
@@ -36,13 +39,17 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        return userDAO.getUserByUsername(username)
+        User user = userDAO.getUserByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("There is no user with this username."));
+        user.setImages(getImages(user.getId()));
+        return user;
     }
 
     public User loadUserByUsernameAndPassword(String username, String password) {
-        return userDAO.getUserByUsernameAndPassword(username, password)
+        User user = userDAO.getUserByUsernameAndPassword(username, password)
                 .orElseThrow(() -> new UsernameNotFoundException("There is no user with this username and password."));
+        user.setImages(getImages(user.getId()));
+        return user;
     }
 
     public User loadUserById(Long id) {
@@ -50,7 +57,9 @@ public class UserService implements UserDetailsService {
         if (userOptional.isEmpty()) {
             throw new UsernameNotFoundException("There is no user with this username.");
         }
-        return userOptional.get();
+        User user = userOptional.get();
+        user.setImages(getImages(user.getId()));
+        return user;
     }
 
     @Transactional
@@ -63,6 +72,13 @@ public class UserService implements UserDetailsService {
 
     public void addImages(long userId, List<String> imageUUIDs) {
         imageUUIDs.forEach(UUID -> userToImagesDAO.addImage(userId, UUID));
+    }
+
+    public List<String> getImages(long userId) {
+        return userToImagesDAO.getImages(userId).stream()
+                .map(FileSystemInteractor::getImage)
+                .map(Coder::encode)
+                .collect(Collectors.toList());
     }
 
     public void addLike(long userId, long eventId) {
