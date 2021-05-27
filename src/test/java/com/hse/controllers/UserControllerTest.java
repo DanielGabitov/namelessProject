@@ -25,17 +25,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @TestPropertySource("/application-test.properties")
 @Sql(value = {"/scripts/before-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-public class AuthenticationControllerTest {
+public class UserControllerTest {
     private final MockMvc mockMvc;
 
     @Autowired
-    public AuthenticationControllerTest(MockMvc mockMvc) {
+    public UserControllerTest(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
     }
 
 //    @Test
 //    @Sql(value = {"/scripts/create-user.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-//    public void testAuthentication() throws Exception {
+//    public void test() throws Exception {
 //        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
 //        map.put("username", List.of("username"));
 //        map.put("password", List.of("password"));
