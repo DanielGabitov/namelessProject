@@ -1,5 +1,6 @@
 package com.hse.controllers;
 
+import com.hse.enums.Specialization;
 import com.hse.models.Event;
 import com.hse.models.User;
 import com.hse.services.FeedService;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.EnumSet;
 import java.util.List;
 
 @RestController
@@ -23,15 +25,16 @@ public class FeedController {
         this.feedService = feedService;
     }
 
-    @GetMapping(value = "/events", consumes = {"application/json"})
+    @GetMapping(value = "/events")
     @ApiOperation(value = "/events", nickname = "Get events for feed", tags = {"Feed"})
     public List<Event> getEvents(@RequestParam("offset") int offset, @RequestParam("size") int size) {
         return feedService.getEvents(offset, size);
     }
 
-    @GetMapping(value = "/creators", consumes = {"application/json"})
+    @GetMapping(value = "/creators")
     @ApiOperation(value = "/creators", nickname = "Get creators for feed", tags = {"Feed"})
-    public List<User> getCreators(@RequestParam("offset") int offset, @RequestParam("size") int size) {
-        return feedService.getCreators(offset, size);
+    public List<User> getCreators(@RequestParam("offset") int offset, @RequestParam("size") int size,
+                                  @RequestParam("specializations") EnumSet<Specialization> specializations) {
+        return feedService.getCreators(offset, size, specializations);
     }
 }
