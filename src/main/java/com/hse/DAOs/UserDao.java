@@ -1,5 +1,6 @@
 package com.hse.DAOs;
 
+import com.hse.enums.Specialization;
 import com.hse.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -8,8 +9,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class UserDao {
@@ -71,6 +75,22 @@ public class UserDao {
 
         return namedJdbcTemplate.query("SELECT * FROM users WHERE userRole = 'CREATOR'" +
                         " OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY;",
+                map, (resultSet, i) -> resultSet.getLong("id"));
+    }
+
+    public List<Long> getCreators(int offset, int size, EnumSet<Specialization> specializations){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("offset", offset);
+        map.addValue("size", size);
+        List<String> values = new ArrayList<>();
+        for (var x : specializations){
+            values.add(x.name());
+        }
+        map.addValue("specializations", values);
+
+        return namedJdbcTemplate.query(
+                "SELECT * FROM users WHERE userRole = 'CREATOR' AND " +
+                    "specialization IN (:specializations) OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY;",
                 map, (resultSet, i) -> resultSet.getLong("id"));
     }
 }

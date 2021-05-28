@@ -32,7 +32,7 @@ public class ImageController {
 
     @GetMapping(value = "/{id}")
     @ApiOperation(value = "", nickname = "Get images of user/event", tags = {"User"})
-    public ResponseEntity<List<String>> getImages(@PathVariable("id") Long id, @RequestParam String entity) {
+    public ResponseEntity<List<String>> getImages(@PathVariable("id") Long id, @RequestParam("entity") String entity) {
         Entity source = Entity.valueOf(entity);
         List<String> encodedImages = imageService.getImages(id, source);
         return new ResponseEntity<>(encodedImages, HttpStatus.OK);

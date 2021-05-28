@@ -1,9 +1,7 @@
 package com.hse.controllers;
 
-import com.hse.exceptions.ServiceException;
 import com.hse.models.Event;
 import com.hse.models.User;
-import com.hse.models.UserRegistrationData;
 import com.hse.services.UserService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,5 +57,12 @@ public class UserController {
     public ResponseEntity<Boolean> checkLike(@PathVariable("userId") long userId,
                                              @PathVariable("eventId") long eventId) {
         return new ResponseEntity<>(userService.checkLike(userId, eventId), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/{userId}/{eventId}/applications", consumes = {"application/json"})
+    @ApiOperation(value = "", nickname = "Send application for event participation", tags = {"User"})
+    public ResponseEntity<String> sendApplication(  @PathVariable("userId") long userId,
+                                                    @PathVariable("eventId") long eventId) {
+        return new ResponseEntity<>("", HttpStatus.OK);
     }
 }
