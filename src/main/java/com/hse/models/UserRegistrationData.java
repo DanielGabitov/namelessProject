@@ -19,7 +19,6 @@ public class UserRegistrationData {
     private String username;
     private String password;
     private Specialization specialization;
-    private float rating;
     private String description;
     private List<String> images;
 

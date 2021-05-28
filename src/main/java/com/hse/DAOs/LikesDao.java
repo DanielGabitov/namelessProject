@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class LikesDao {
@@ -26,14 +25,15 @@ public class LikesDao {
         namedJdbcTemplate.update("INSERT INTO likes (userId, eventid) VALUES (:userId, :eventId)", map);
     }
 
-    public Optional<Void> checkLike(long userId, long eventId) {
+    public boolean checkLike(long userId, long eventId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);
         map.addValue("eventId", eventId);
 
-        return namedJdbcTemplate.query(
-                "SELECT * FROM likes WHERE eventid = :eventId AND userId = :userId",
-                map, (resultSet, i) -> (Void) null).stream().findAny();
+        Integer count = namedJdbcTemplate.queryForObject(
+                "SELECT count(eventid) FROM likes WHERE eventid = :eventId AND userId = :userId",
+                map, Integer.class);
+        return count != null && count > 0;
     }
 
     public void removeLike(long userId, long eventId) {
