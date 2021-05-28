@@ -9,10 +9,10 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class UserDao {
@@ -67,7 +67,7 @@ public class UserDao {
         return (long) keyHolder.getKeyList().get(0).get("id");
     }
 
-    public List<User> getCreators(int offset, int size){
+    public List<User> getCreators(int offset, int size) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("offset", offset);
         map.addValue("size", size);
@@ -77,19 +77,16 @@ public class UserDao {
                 map, userMapper);
     }
 
-    public List<User> getCreators(int offset, int size, EnumSet<Specialization> specializations){
+    public List<User> getCreators(int offset, int size, EnumSet<Specialization> specializations) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("offset", offset);
         map.addValue("size", size);
-        List<String> values = new ArrayList<>();
-        for (var x : specializations){
-            values.add(x.name());
-        }
+        List<String> values = specializations.stream().map(Specialization::name).collect(Collectors.toList());
         map.addValue("specializations", values);
 
         return namedJdbcTemplate.query(
                 "SELECT * FROM users WHERE userRole = 'CREATOR' AND " +
-                    "specialization IN (:specializations) OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY;",
+                        "specialization IN (:specializations) OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY;",
                 map, userMapper);
     }
 }

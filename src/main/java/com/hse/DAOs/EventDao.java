@@ -1,5 +1,6 @@
 package com.hse.DAOs;
 
+import com.hse.enums.Specialization;
 import com.hse.models.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -8,6 +9,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,6 +60,22 @@ public class EventDao {
         map.addValue("size", size);
 
         return namedJdbcTemplate.query("SELECT * FROM events OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY",
+                map, eventMapper);
+    }
+
+    public List<Event> getEvents(int offset, int size, EnumSet<Specialization> specializations) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("offset", offset);
+        map.addValue("size", size);
+        List<String> values = new ArrayList<>();
+        for (var x : specializations) {
+            values.add(x.name());
+        }
+        map.addValue("specializations", values);
+
+        return namedJdbcTemplate.query(
+                "SELECT * FROM events WHERE specialization IN (:specializations) " +
+                        "OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY;",
                 map, eventMapper);
     }
 }

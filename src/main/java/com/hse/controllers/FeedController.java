@@ -27,8 +27,9 @@ public class FeedController {
 
     @GetMapping(value = "/events")
     @ApiOperation(value = "/events", nickname = "Get events for feed", tags = {"Feed"})
-    public List<Event> getEvents(@RequestParam("offset") int offset, @RequestParam("size") int size) {
-        return feedService.getEvents(offset, size);
+    public List<Event> getEvents(@RequestParam("offset") int offset, @RequestParam("size") int size,
+                                 @RequestParam("specializations") EnumSet<Specialization> specializations) {
+        return feedService.getEvents(offset, size, specializations);
     }
 
     @GetMapping(value = "/creators")
