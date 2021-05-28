@@ -10,37 +10,28 @@ import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class FeedService {
 
     private final EventDao eventDao;
-    private final EventService eventService;
-
     private final UserDao userDao;
-    private final UserService userService;
 
     @Autowired
-    public FeedService(EventDao eventDao, EventService eventService, UserDao userDao, UserService userService) {
+    public FeedService(EventDao eventDao, UserDao userDao) {
         this.eventDao = eventDao;
-        this.eventService = eventService;
         this.userDao = userDao;
-        this.userService = userService;
     }
 
     public List<Event> getEvents(int offset, int size) {
-        List<Long> eventIds = eventDao.getEvents(offset, size);
-        return eventIds.stream().map(eventService::getEvent).collect(Collectors.toList());
+        return eventDao.getEvents(offset, size);
     }
 
-    public List<User> getCreators(int offset, int size, EnumSet<Specialization> specializations){
-        List<Long> creatorsIds;
-        if (specializations.isEmpty()){
-            creatorsIds = userDao.getCreators(offset, size);
+    public List<User> getCreators(int offset, int size, EnumSet<Specialization> specializations) {
+        if (specializations.isEmpty()) {
+            return userDao.getCreators(offset, size);
         } else {
-            creatorsIds = userDao.getCreators(offset, size, specializations);
+            return userDao.getCreators(offset, size, specializations);
         }
-        return creatorsIds.stream().map(userService::loadUserById).collect(Collectors.toList());
     }
 }

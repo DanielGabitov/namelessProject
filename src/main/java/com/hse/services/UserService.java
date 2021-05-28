@@ -96,7 +96,7 @@ public class UserService implements UserDetailsService {
     }
 
     public boolean checkLike(long userId, long eventId) {
-        return likesDAO.checkLike(userId, eventId).isPresent();
+        return likesDAO.checkLike(userId, eventId);
     }
 
     public List<Event> getLikes(long userId) {
@@ -104,7 +104,7 @@ public class UserService implements UserDetailsService {
         for (Long eventId : likesDAO.getUserLikes(userId)) {
             Optional<Event> optionalEvent = eventDao.getEvent(eventId);
             if (optionalEvent.isEmpty()) {
-                throw new ServiceException("Не существует Event с id" + eventId);
+                throw new ServiceException("There is no Event with this id " + eventId);
             }
             list.add(optionalEvent.get());
         }
@@ -120,7 +120,7 @@ public class UserService implements UserDetailsService {
         user.setUsername(data.getUsername());
         user.setPassword(data.getPassword());
         user.setSpecialization(data.getSpecialization());
-        user.setRating(data.getRating());
+        user.setRating(1);
         user.setDescription(data.getDescription());
 
         user.setImages(List.of());

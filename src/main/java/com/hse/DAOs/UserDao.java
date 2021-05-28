@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class UserDao {
@@ -68,17 +67,17 @@ public class UserDao {
         return (long) keyHolder.getKeyList().get(0).get("id");
     }
 
-    public List<Long> getCreators(int offset, int size){
+    public List<User> getCreators(int offset, int size){
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("offset", offset);
         map.addValue("size", size);
 
         return namedJdbcTemplate.query("SELECT * FROM users WHERE userRole = 'CREATOR'" +
                         " OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY;",
-                map, (resultSet, i) -> resultSet.getLong("id"));
+                map, userMapper);
     }
 
-    public List<Long> getCreators(int offset, int size, EnumSet<Specialization> specializations){
+    public List<User> getCreators(int offset, int size, EnumSet<Specialization> specializations){
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("offset", offset);
         map.addValue("size", size);
@@ -91,6 +90,6 @@ public class UserDao {
         return namedJdbcTemplate.query(
                 "SELECT * FROM users WHERE userRole = 'CREATOR' AND " +
                     "specialization IN (:specializations) OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY;",
-                map, (resultSet, i) -> resultSet.getLong("id"));
+                map, userMapper);
     }
 }

@@ -26,10 +26,10 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/authentication")
-    public ResponseEntity<String> authentication(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<Long> authentication(@RequestParam String username, @RequestParam String password) {
         User user = userService.loadUserByUsernameAndPassword(username, password);
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, jwtProvider.generateToken(user.getUsername()))
-                .build();
+                .body(user.getId());
     }
 }
