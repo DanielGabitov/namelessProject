@@ -51,11 +51,16 @@ public class EventService {
             throw new ServiceException("Failed to find event with given ID.");
         }
         Event event = optionalEvent.get();
+        setEventDataFromOtherTables(event);
+        return event;
+    }
+
+    public void setEventDataFromOtherTables(Event event) {
+        Long id = event.getId();
         event.setParticipantsIDs(getParticipants(id));
         event.setOrganizerIDs(getOrganizers(id));
         event.setImages(getImages(id));
         event.setLikes(getLikes(id));
-        return event;
     }
 
     public void addParticipants(long eventId, List<Long> participants) {
