@@ -5,12 +5,11 @@ import com.hse.DAOs.LikesDao;
 import com.hse.DAOs.UserDao;
 import com.hse.DAOs.UserToImagesDao;
 import com.hse.exceptions.ServiceException;
-import com.hse.models.Event;
-import com.hse.models.User;
-import com.hse.models.UserRegistrationData;
+import com.hse.models.*;
 import com.hse.systems.FileSystemInteractor;
 import com.hse.utils.Coder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,12 +29,18 @@ public class UserService implements UserDetailsService {
     private final EventDao eventDao;
     private final LikesDao likesDAO;
 
+    private final EventService eventService;
+    private final NotificationService notificationService;
+
     @Autowired
-    public UserService(UserDao userDAO, UserToImagesDao userToImagesDAO, LikesDao likesDAO, EventDao eventDao) {
+    public UserService(UserDao userDAO, UserToImagesDao userToImagesDAO, LikesDao likesDAO,
+                       EventDao eventDao, NotificationService notificationService, EventService eventService) {
         this.userDAO = userDAO;
         this.userToImagesDAO = userToImagesDAO;
         this.likesDAO = likesDAO;
         this.eventDao = eventDao;
+        this.notificationService = notificationService;
+        this.eventService = eventService;
     }
 
     @Override
@@ -83,14 +89,14 @@ public class UserService implements UserDetailsService {
 
     public void addLike(long userId, long eventId) {
         if (checkLike(userId, eventId)) {
-            throw new ServiceException("Like already exists");
+            throw new ServiceException(HttpStatus.BAD_REQUEST, "Like already exists");
         }
         likesDAO.addLike(userId, eventId);
     }
 
     public void removeLike(long userId, long eventId) {
         if (!checkLike(userId, eventId)) {
-            throw new ServiceException("Like does not exists");
+            throw new ServiceException(HttpStatus.BAD_REQUEST, "Like does not exists");
         }
         likesDAO.removeLike(userId, eventId);
     }
@@ -104,11 +110,64 @@ public class UserService implements UserDetailsService {
         for (Long eventId : likesDAO.getUserLikes(userId)) {
             Optional<Event> optionalEvent = eventDao.getEvent(eventId);
             if (optionalEvent.isEmpty()) {
-                throw new ServiceException("There is no Event with this id " + eventId);
+                throw new ServiceException(HttpStatus.BAD_REQUEST, "There is no Event with this id " + eventId);
             }
             list.add(optionalEvent.get());
         }
         return list;
+    }
+
+    public void inviteCreator(long organizerId, long creatorId, long eventId, String message) {
+        Optional<Invitation> inviteOptional = userDAO.getCreatorInviteFromEvent(creatorId, eventId);
+        if (inviteOptional.isPresent()) {
+            String exceptionMessage = "Invite from event " + eventId + " to creator " + creatorId + "already exists.";
+            throw new ServiceException(HttpStatus.BAD_REQUEST, exceptionMessage);
+        }
+        userDAO.inviteCreator(creatorId, organizerId, eventId, message);
+        notificationService.sendNewInvitationNotification(creatorId, eventId);
+    }
+
+    public void answerInvite(long creatorId, long eventId, boolean acceptance) {
+        Optional<Invitation> inviteOptional = userDAO.getCreatorInviteFromEvent(creatorId, eventId);
+        if (inviteOptional.isEmpty()) {
+            String exceptionMessage = "Invite from event " + eventId + " to creator " + creatorId + "does not exists.";
+            throw new ServiceException(HttpStatus.BAD_REQUEST, exceptionMessage);
+        }
+        userDAO.answerInvite(creatorId, eventId, acceptance);
+        Long organizerId = eventService.getEventOrganizer(eventId);
+        notificationService.sendInvitationAnswerNotification(creatorId, organizerId, acceptance);
+    }
+
+    public void answerApplication(long creatorId, long eventId, boolean accepted) {
+        Optional<Application> inviteOptional = userDAO.getCreatorEventApplication(creatorId, eventId);
+        if (inviteOptional.isEmpty()) {
+            String exceptionMessage = "Application from creator " + creatorId + " to event " + eventId + " does not exists.";
+            throw new ServiceException(HttpStatus.BAD_REQUEST, exceptionMessage);
+        }
+        userDAO.answerApplication(eventId, creatorId, accepted);
+        notificationService.sendApplicationAnswerNotification(creatorId, eventId, accepted);
+    }
+
+    public void sendApplication(long eventId, long creatorId, String message) {
+        Optional<Application> applicationOptional = userDAO.getCreatorEventApplication(creatorId, eventId);
+        if (applicationOptional.isPresent()) {
+            String exceptionMessage = "Application from creator " + creatorId + " to event " + eventId + "already exists.";
+            throw new ServiceException(HttpStatus.BAD_REQUEST, exceptionMessage);
+        }
+        userDAO.sendEventApplication(creatorId, eventId, message);
+        Long organizerId = eventService.getEventOrganizer(eventId);
+        notificationService.sendNewApplicationNotification(creatorId, organizerId);
+    }
+
+    public List<Invitation> getCreatorInvitations(long creatorId) {
+        return userDAO.getCreatorInvites(creatorId);
+    }
+
+    public List<Application> getOrganizerApplications(long organizerId) {
+        return eventDao.getOrganizerEvents(organizerId).stream()
+                .map(eventService::getEventApplications)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 
     private User readRegistrationData(UserRegistrationData data) {

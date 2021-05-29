@@ -8,6 +8,7 @@ import com.hse.models.User;
 import com.hse.systems.FileSystemInteractor;
 import com.hse.utils.Coder;
 import com.hse.utils.UUIDGenerator;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -62,7 +63,7 @@ public class ImageService {
                 userService.addImages(destinationId, imageUUIDs);
                 break;
             default:
-                throw new ServiceException("Unknown entity " + destination.name());
+                throw new ServiceException(HttpStatus.BAD_REQUEST, "Unknown entity " + destination.name());
         }
     }
 
@@ -78,7 +79,7 @@ public class ImageService {
                 imageHashes = user.getImages();
                 break;
             default:
-                throw new ServiceException("Unknown entity " + source.name());
+                throw new ServiceException(HttpStatus.BAD_REQUEST, "Unknown entity " + source.name());
         }
         List<byte[]> images = loadImagesFromFileSystem(imageHashes);
         return images.stream().map(Coder::encode).collect(Collectors.toList());

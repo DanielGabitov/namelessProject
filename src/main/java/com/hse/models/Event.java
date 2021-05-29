@@ -17,7 +17,7 @@ public class Event {
     private String name;
     private String description;
     private List<String> images;
-    private List<Long> organizerIDs;
+    private Long organizerId;
     private List<Long> participantsIDs;
     private float rating;
     private String geoData;

@@ -1,6 +1,8 @@
 package com.hse.DAOs;
 
 import com.hse.enums.Specialization;
+import com.hse.mappers.ApplicationMapper;
+import com.hse.models.Application;
 import com.hse.models.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,17 +15,21 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class EventDao {
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     private final RowMapper<Event> eventMapper;
+    private final ApplicationMapper applicationMapper;
 
     @Autowired
-    public EventDao(NamedParameterJdbcTemplate namedJdbcTemplate, RowMapper<Event> eventMapper) {
+    public EventDao(NamedParameterJdbcTemplate namedJdbcTemplate, RowMapper<Event> eventMapper,
+                    ApplicationMapper applicationMapper) {
         this.namedJdbcTemplate = namedJdbcTemplate;
         this.eventMapper = eventMapper;
+        this.applicationMapper = applicationMapper;
     }
 
 
@@ -67,15 +73,28 @@ public class EventDao {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("offset", offset);
         map.addValue("size", size);
-        List<String> values = new ArrayList<>();
-        for (var x : specializations) {
-            values.add(x.name());
-        }
+        List<String> values = specializations.stream().map(Specialization::name).collect(Collectors.toList());;
         map.addValue("specializations", values);
 
         return namedJdbcTemplate.query(
                 "SELECT * FROM events WHERE specialization IN (:specializations) " +
                         "OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY;",
                 map, eventMapper);
+    }
+
+    public List<Long> getOrganizerEvents(long organizerId){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("organizerId", organizerId);
+        return namedJdbcTemplate.query("SELECT * FROM events WHERE organizerid = :organizerId",
+                map,
+                (resultSet, i) -> resultSet.getLong("id"));
+    }
+
+    public List<Application> getEventApplications(long eventId){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("eventId", eventId);
+        return namedJdbcTemplate.query(
+                "SELECT * from creators_invites WHERE eventid = :eventId",
+                map, applicationMapper);
     }
 }

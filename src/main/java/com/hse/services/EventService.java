@@ -2,11 +2,13 @@ package com.hse.services;
 
 import com.hse.DAOs.*;
 import com.hse.exceptions.ServiceException;
+import com.hse.models.Application;
 import com.hse.models.Event;
 import com.hse.models.EventRegistrationData;
 import com.hse.systems.FileSystemInteractor;
 import com.hse.utils.Coder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,26 +41,33 @@ public class EventService {
         Event event = readRegistrationData(eventRegistrationData);
         long eventId = eventDAO.createEvent(event);
         addParticipants(eventId, event.getParticipantsIDs());
-        addOrganizers(eventId, event.getOrganizerIDs());
         List<String> imageUUIDs = ImageService.saveImagesToFileSystem(eventRegistrationData.getImages());
         addImages(eventId, imageUUIDs);
     }
 
     @Transactional
-    public Event getEvent(long id) {
-        Optional<Event> optionalEvent = eventDAO.getEvent(id);
-        if (optionalEvent.isEmpty()) {
-            throw new ServiceException("Failed to find event with given ID.");
-        }
-        Event event = optionalEvent.get();
+    public Event getEvent(long eventId) {
+        Event event = getEventFromEventTable(eventId);
         setEventDataFromOtherTables(event);
         return event;
+    }
+
+    private Event getEventFromEventTable(long eventId){
+        Optional<Event> optionalEvent = eventDAO.getEvent(eventId);
+        if (optionalEvent.isEmpty()) {
+            throw new ServiceException(HttpStatus.BAD_REQUEST, "Failed to find event with given ID.");
+        }
+        return optionalEvent.get();
+    }
+
+    public Long getEventOrganizer(long eventId){
+        Event event = getEventFromEventTable(eventId);
+        return event.getOrganizerId();
     }
 
     public void setEventDataFromOtherTables(Event event) {
         Long id = event.getId();
         event.setParticipantsIDs(getParticipants(id));
-        event.setOrganizerIDs(getOrganizers(id));
         event.setImages(getImages(id));
         event.setLikes(getLikes(id));
     }
@@ -69,14 +78,6 @@ public class EventService {
 
     public List<Long> getParticipants(long eventId) {
         return eventToParticipantDAO.getParticipants(eventId);
-    }
-
-    public void addOrganizers(long eventId, List<Long> organizers) {
-        organizers.forEach(organizer -> eventToOrganizerDAO.addOrganizer(eventId, organizer));
-    }
-
-    public List<Long> getOrganizers(long eventId) {
-        return eventToOrganizerDAO.getOrganizers(eventId);
     }
 
     public void addImages(long eventId, List<String> imageUUIDs) {
@@ -94,6 +95,10 @@ public class EventService {
         return likesDAO.getEventLikes(eventId);
     }
 
+    public List<Application> getEventApplications(long eventId){
+        return eventDAO.getEventApplications(eventId);
+    }
+
     private Event readRegistrationData(EventRegistrationData data) {
         Event event = new Event();
         event.setName(data.getName());
@@ -105,7 +110,6 @@ public class EventService {
 
         event.setLikes(List.of());
         event.setImages(List.of());
-        event.setOrganizerIDs(List.of());
         event.setParticipantsIDs(List.of());
 
         return event;

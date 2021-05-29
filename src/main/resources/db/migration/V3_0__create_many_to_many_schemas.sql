@@ -33,7 +33,24 @@ CREATE TABLE likes
 
 CREATE TABLE users_subscriptions
 (
-    userId bigint NOT NULL,
+    userId         bigint NOT NULL,
     subscriptionId bigint NOT NULL,
     PRIMARY KEY (userId, subscriptionId)
-)
+);
+
+CREATE TABLE creators_invites
+(
+    creatorId bigint NOT NULL,
+    organizerId bigint NOT NULL ,
+    eventId bigint NOT NULL ,
+    message text,
+    accepted bool
+);
+
+CREATE TABLE event_applications
+(
+    eventId   bigint NOT NULL,
+    creatorId bigint NOT NULL,
+    message   text,
+    accepted  bool
+);
