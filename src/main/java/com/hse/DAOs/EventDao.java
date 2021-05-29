@@ -97,4 +97,31 @@ public class EventDao {
                 "SELECT * from creators_invites WHERE eventid = :eventId",
                 map, applicationMapper);
     }
+
+    public void addParticipant(long eventId, long participantId){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("eventId", eventId);
+        map.addValue("participantId", participantId);
+        namedJdbcTemplate.update(
+                "INSERT INTO events_participants (eventid, userid) " +
+                    "VALUES (:eventId, :userId)", map);
+    }
+
+    public void deleteParticipant(long eventId, long participantId){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("eventId", eventId);
+        map.addValue("participantId", participantId);
+        namedJdbcTemplate.update(
+                "DELETE FROM events_participants WHERE eventid = :eventId AND userid = :userId", map);
+    }
+
+    public boolean checkParticipant(long eventId, long participantId){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("eventId", eventId);
+        map.addValue("participantId", participantId);
+        Integer count = namedJdbcTemplate.queryForObject(
+                "SELECT count(userId) FROM events_participants " +
+                    "WHERE eventid = :eventId AND userId = :userId", map, Integer.class);
+        return count != null && count > 0;
+    }
 }

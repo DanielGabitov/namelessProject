@@ -170,6 +170,26 @@ public class UserService implements UserDetailsService {
                 .collect(Collectors.toList());
     }
 
+    public void participate(long userId, long eventId){
+        if (eventDao.checkParticipant(eventId, userId)){
+            String exceptionMessage = "User " + userId + " already participate in event " + eventId;
+            throw new ServiceException(HttpStatus.BAD_REQUEST, exceptionMessage);
+        }
+        eventDao.addParticipant(eventId, userId);
+    }
+
+    public void cancelParticipation(long userId, long eventId){
+        if (!eventDao.checkParticipant(eventId, userId)){
+            String exceptionMessage = "User " + userId + " do not participate in event " + eventId;
+            throw new ServiceException(HttpStatus.BAD_REQUEST, exceptionMessage);
+        }
+        eventDao.deleteParticipant(eventId, userId);
+    }
+
+    public boolean checkParticipation(long userId, long eventId){
+        return eventDao.checkParticipant(eventId, userId);
+    }
+
     private User readRegistrationData(UserRegistrationData data) {
         User user = new User();
         user.setUserRole(data.getUserRole());
