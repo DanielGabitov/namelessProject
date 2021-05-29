@@ -97,7 +97,7 @@ public class EventDao {
                 "SELECT * from creators_invites WHERE eventid = :eventId",
                 map, applicationMapper);
     }
-
+  
     public void addParticipant(long eventId, long participantId){
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("eventId", eventId);
