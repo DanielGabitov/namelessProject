@@ -21,31 +21,31 @@ public class SubscriptionService {
         this.subscriptionDao = subscriptionDao;
     }
 
-    public void addSubscription(Long userId, Long subscriptionId) {
-        if (userId.equals(subscriptionId)) {
+    public void addSubscription(long userId, long subscriptionId) {
+        if (userId == subscriptionId) {
             throw new ServiceException("User cannot subscribe to himself.");
         } else if (checkSubscription(userId, subscriptionId)) {
             throw new ServiceException("Subscription already exist.");
         }
-        User subscription = userService.loadUserById(subscriptionId);
-        if (subscription.getUserRole().equals(UserRole.USER)) {
-            throw new SecurityException("There is no way to subscribe to the user.");
+        User userToSubscribe = userService.loadUserById(subscriptionId);
+        if (userToSubscribe.getUserRole().equals(UserRole.USER)) {
+            throw new ServiceException("There is no way to subscribe to the user.");
         }
         subscriptionDao.addSubscription(userId, subscriptionId);
     }
 
-    public boolean checkSubscription(Long userId, Long subscriptionId) {
+    public boolean checkSubscription(long userId, long subscriptionId) {
         return subscriptionDao.checkSubscription(userId, subscriptionId);
     }
 
-    public void deleteSubscription(Long userId, Long subscriptionId) {
+    public void deleteSubscription(long userId, long subscriptionId) {
         if (!checkSubscription(userId, subscriptionId)) {
             throw new ServiceException("Subscription dost not exist.");
         }
         subscriptionDao.deleteSubscription(userId, subscriptionId);
     }
 
-    public List<User> getAllSubscriptions(Long userId) {
+    public List<User> getAllSubscriptions(long userId) {
         return subscriptionDao.getAllSubscriptionIds(userId).stream()
                 .map(userService::loadUserById)
                 .collect(Collectors.toList());

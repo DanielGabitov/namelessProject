@@ -21,21 +21,21 @@ public class SubscriptionController {
     }
 
     @PostMapping
-    public ResponseEntity<String> addSubscription(@RequestParam("userId") Long userId,
-                                                  @RequestParam("subscriptionId") Long subscriptionId) {
+    public ResponseEntity<String> addSubscription(@RequestParam("userId") long userId,
+                                                  @RequestParam("subscriptionId") long subscriptionId) {
         subscriptionService.addSubscription(userId, subscriptionId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping
-    public ResponseEntity<String> deleteSubscription(@RequestParam("userId") Long userId,
-                                                     @RequestParam("subscriptionId") Long subscriptionId) {
+    public ResponseEntity<String> deleteSubscription(@RequestParam("userId") long userId,
+                                                     @RequestParam("subscriptionId") long subscriptionId) {
         subscriptionService.deleteSubscription(userId, subscriptionId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllSubscriptions(@RequestParam("userId") Long userId) {
+    public ResponseEntity<List<User>> getAllSubscriptions(@RequestParam("userId") long userId) {
         List<User> subscriptionIds = subscriptionService.getAllSubscriptions(userId);
         return new ResponseEntity<>(subscriptionIds, HttpStatus.OK);
     }

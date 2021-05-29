@@ -16,7 +16,7 @@ public class SubscriptionDao {
         this.namedJdbcTemplate = namedJdbcTemplate;
     }
 
-    public void addSubscription(Long userId, Long subscriptionId) {
+    public void addSubscription(long userId, long subscriptionId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);
         map.addValue("subscriptionId", subscriptionId);
@@ -24,7 +24,7 @@ public class SubscriptionDao {
                 "INSERT INTO users_subscriptions (userid, subscriptionid) VALUES (:userId, :subscriptionId)", map);
     }
 
-    public boolean checkSubscription(Long userId, Long subscriptionId) {
+    public boolean checkSubscription(long userId, long subscriptionId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);
         map.addValue("subscriptionId", subscriptionId);
@@ -34,7 +34,7 @@ public class SubscriptionDao {
         return count != null && count > 0;
     }
 
-    public void deleteSubscription(Long userId, Long subscriptionId) {
+    public void deleteSubscription(long userId, long subscriptionId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);
         map.addValue("subscriptionId", subscriptionId);
@@ -44,7 +44,7 @@ public class SubscriptionDao {
                 map);
     }
 
-    public List<Long> getAllSubscriptionIds(Long userId) {
+    public List<Long> getAllSubscriptionIds(long userId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);
 
