@@ -30,3 +30,10 @@ CREATE TABLE likes
     eventId bigint NOT NULL,
     PRIMARY KEY (userId, eventId)
 );
+
+CREATE TABLE users_subscriptions
+(
+    userId bigint NOT NULL,
+    subscriptionId bigint NOT NULL,
+    PRIMARY KEY (userId, subscriptionId)
+)
