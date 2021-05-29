@@ -76,4 +76,20 @@ public class UserController {
         notificationService.deleteNotifications(notificationIds);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PostMapping(value = "/{userId}/events/{eventId}/participants")
+    @ApiOperation(value = "", nickname = "", tags = {"User"})
+    public ResponseEntity<String> participate(@PathVariable("userId") long userId,
+                                              @PathVariable("eventId") long eventId){
+        userService.participate(userId, eventId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/{userId}/events/{eventId}/participants")
+    @ApiOperation(value = "", nickname = "", tags = {"User"})
+    public ResponseEntity<String> cancelParticipation(@PathVariable("userId") long userId,
+                                                      @PathVariable("eventId") long eventId){
+        userService.cancelParticipation(userId, eventId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
