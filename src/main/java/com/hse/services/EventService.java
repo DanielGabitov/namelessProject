@@ -53,16 +53,13 @@ public class EventService {
     }
 
     private Event getEventFromEventTable(long eventId){
-        Optional<Event> optionalEvent = eventDAO.getEvent(eventId);
-        if (optionalEvent.isEmpty()) {
-            throw new ServiceException(HttpStatus.BAD_REQUEST, "Failed to find event with given ID.");
-        }
-        return optionalEvent.get();
+        return eventDAO.getEvent(eventId).orElseThrow(
+                () -> new ServiceException(HttpStatus.BAD_REQUEST, "Failed to find event with given ID.")
+        );
     }
 
     public Long getEventOrganizer(long eventId){
-        Event event = getEventFromEventTable(eventId);
-        return event.getOrganizerId();
+        return getEventFromEventTable(eventId).getOrganizerId();
     }
 
     public void setEventDataFromOtherTables(Event event) {

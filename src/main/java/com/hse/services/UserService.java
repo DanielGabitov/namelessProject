@@ -118,7 +118,7 @@ public class UserService implements UserDetailsService {
     }
 
     public void inviteCreator(long organizerId, long creatorId, long eventId, String message) {
-        Optional<Invitation> inviteOptional = userDAO.getCreatorInviteFromEvent(creatorId, eventId);
+        Optional<Invitation> inviteOptional = userDAO.getCreatorInvitationFromEvent(creatorId, eventId);
         if (inviteOptional.isPresent()) {
             String exceptionMessage = "Invite from event " + eventId + " to creator " + creatorId + "already exists.";
             throw new ServiceException(HttpStatus.BAD_REQUEST, exceptionMessage);
@@ -127,13 +127,13 @@ public class UserService implements UserDetailsService {
         notificationService.sendNewInvitationNotification(creatorId, eventId);
     }
 
-    public void answerInvite(long creatorId, long eventId, boolean acceptance) {
-        Optional<Invitation> inviteOptional = userDAO.getCreatorInviteFromEvent(creatorId, eventId);
+    public void answerInvitation(long creatorId, long eventId, boolean acceptance) {
+        Optional<Invitation> inviteOptional = userDAO.getCreatorInvitationFromEvent(creatorId, eventId);
         if (inviteOptional.isEmpty()) {
             String exceptionMessage = "Invite from event " + eventId + " to creator " + creatorId + "does not exists.";
             throw new ServiceException(HttpStatus.BAD_REQUEST, exceptionMessage);
         }
-        userDAO.answerInvite(creatorId, eventId, acceptance);
+        userDAO.answerInvitation(creatorId, eventId, acceptance);
         Long organizerId = eventService.getEventOrganizer(eventId);
         notificationService.sendInvitationAnswerNotification(creatorId, organizerId, acceptance);
     }
@@ -160,7 +160,7 @@ public class UserService implements UserDetailsService {
     }
 
     public List<Invitation> getCreatorInvitations(long creatorId) {
-        return userDAO.getCreatorInvites(creatorId);
+        return userDAO.getCreatorInvitations(creatorId);
     }
 
     public List<Application> getOrganizerApplications(long organizerId) {

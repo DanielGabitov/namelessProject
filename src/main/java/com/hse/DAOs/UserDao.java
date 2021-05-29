@@ -99,7 +99,7 @@ public class UserDao {
                 map, userMapper);
     }
 
-    public Optional<Invitation> getCreatorInviteFromEvent(long creatorId, long eventId){
+    public Optional<Invitation> getCreatorInvitationFromEvent(long creatorId, long eventId){
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("creatorId", creatorId);
         map.addValue("eventId", eventId);
@@ -110,7 +110,7 @@ public class UserDao {
         ).stream().findAny();
     }
 
-    public List<Invitation> getCreatorInvites(long creatorId){
+    public List<Invitation> getCreatorInvitations(long creatorId){
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("creatorId", creatorId);
         return namedJdbcTemplate.query(
@@ -161,7 +161,7 @@ public class UserDao {
                         " VALUES (:creatorId, :organizerId, :eventId, :message, NULL)", map);
     }
 
-    public void answerInvite(long creatorId, long eventId, boolean accept){
+    public void answerInvitation(long creatorId, long eventId, boolean accept){
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("creatorId", creatorId);
         map.addValue("eventId", eventId);

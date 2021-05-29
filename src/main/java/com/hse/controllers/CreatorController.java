@@ -21,7 +21,7 @@ public class CreatorController {
         this.userService = userService;
     }
 
-    @PostMapping(value = "/{creatorId}/applications/{eventId}", consumes = {"application/json"})
+    @PostMapping(value = "/{creatorId}/applications/{eventId}")
     @ApiOperation(value = "", nickname = "", tags = {"User"})
     public ResponseEntity<String> sendApplication(@PathVariable("eventId") long eventId,
                                                   @PathVariable("creatorId") long creatorId,
@@ -32,10 +32,10 @@ public class CreatorController {
 
     @PostMapping(value = "/{creatorId}/invites/{eventId}")
     @ApiOperation(value = "", nickname = "", tags = {"User"})
-    public ResponseEntity<String> answerInvite(@PathVariable("eventId") long eventId,
-                                               @PathVariable("creatorId") long creatorId,
-                                               @RequestParam("acceptance") boolean acceptance) {
-        userService.answerInvite(creatorId, eventId, acceptance);
+    public ResponseEntity<String> answerInvitation(@PathVariable("eventId") long eventId,
+                                                   @PathVariable("creatorId") long creatorId,
+                                                   @RequestParam("acceptance") boolean acceptance) {
+        userService.answerInvitation(creatorId, eventId, acceptance);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
