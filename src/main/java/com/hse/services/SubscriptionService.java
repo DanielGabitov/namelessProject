@@ -5,6 +5,7 @@ import com.hse.enums.UserRole;
 import com.hse.exceptions.ServiceException;
 import com.hse.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,13 +24,13 @@ public class SubscriptionService {
 
     public void addSubscription(long userId, long subscriptionId) {
         if (userId == subscriptionId) {
-            throw new ServiceException("User cannot subscribe to himself.");
+            throw new ServiceException(HttpStatus.BAD_REQUEST, "User cannot subscribe to himself.");
         } else if (checkSubscription(userId, subscriptionId)) {
-            throw new ServiceException("Subscription already exist.");
+            throw new ServiceException(HttpStatus.BAD_REQUEST, "Subscription already exist.");
         }
         User userToSubscribe = userService.loadUserById(subscriptionId);
         if (userToSubscribe.getUserRole().equals(UserRole.USER)) {
-            throw new ServiceException("There is no way to subscribe to the user.");
+            throw new ServiceException(HttpStatus.BAD_REQUEST, "There is no way to subscribe to the user.");
         }
         subscriptionDao.addSubscription(userId, subscriptionId);
     }
@@ -40,7 +41,7 @@ public class SubscriptionService {
 
     public void deleteSubscription(long userId, long subscriptionId) {
         if (!checkSubscription(userId, subscriptionId)) {
-            throw new ServiceException("Subscription dost not exist.");
+            throw new ServiceException(HttpStatus.BAD_REQUEST, "Subscription dost not exist.");
         }
         subscriptionDao.deleteSubscription(userId, subscriptionId);
     }

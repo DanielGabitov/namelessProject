@@ -1,6 +1,10 @@
 package com.hse.DAOs;
 
 import com.hse.enums.Specialization;
+import com.hse.mappers.ApplicationMapper;
+import com.hse.mappers.InviteMapper;
+import com.hse.models.Application;
+import com.hse.models.Invitation;
 import com.hse.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -19,11 +23,16 @@ public class UserDao {
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     private final RowMapper<User> userMapper;
+    private final ApplicationMapper applicationMapper;
+    private final InviteMapper inviteMapper;
 
     @Autowired
-    public UserDao(NamedParameterJdbcTemplate namedJdbcTemplate, RowMapper<User> userMapper) {
+    public UserDao(NamedParameterJdbcTemplate namedJdbcTemplate, RowMapper<User> userMapper,
+                   ApplicationMapper applicationMapper, InviteMapper inviteMapper) {
         this.namedJdbcTemplate = namedJdbcTemplate;
         this.userMapper = userMapper;
+        this.applicationMapper = applicationMapper;
+        this.inviteMapper = inviteMapper;
     }
 
     public Optional<User> getUserById(Long userId) throws IllegalArgumentException {
@@ -88,5 +97,89 @@ public class UserDao {
                 "SELECT * FROM users WHERE userRole = 'CREATOR' AND " +
                         "specialization IN (:specializations) OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY;",
                 map, userMapper);
+    }
+
+    public Optional<Invitation> getCreatorInvitationFromEvent(long creatorId, long eventId){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("creatorId", creatorId);
+        map.addValue("eventId", eventId);
+        return namedJdbcTemplate.query(
+                "SELECT * from creators_invites WHERE creatorid = :creatorId AND eventid = :eventId",
+                map,
+                inviteMapper
+        ).stream().findAny();
+    }
+
+    public List<Invitation> getCreatorInvitations(long creatorId){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("creatorId", creatorId);
+        return namedJdbcTemplate.query(
+                "SELECT * from creators_invites WHERE creatorid = :creatorId",
+                map,
+                inviteMapper
+        );
+    }
+
+    public Optional<Application> getCreatorEventApplication(long creatorId, long eventId){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("eventId", eventId);
+        map.addValue("creatorId", creatorId);
+        return namedJdbcTemplate.query(
+                "SELECT * from creators_invites WHERE creatorid = :creatorId AND eventid = :eventId",
+                map,
+                applicationMapper
+        ).stream().findAny();
+    }
+
+    public List<Application> getCreatorEventApplications(long creatorId){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("creatorId", creatorId);
+        return namedJdbcTemplate.query(
+                "SELECT * from creators_invites WHERE creatorId = :creatorId",
+                map, applicationMapper);
+    }
+
+    public void sendEventApplication(long creatorId, long eventId, String message){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("creatorId", creatorId);
+        map.addValue("eventId", eventId);
+        map.addValue("message", message);
+        map.addValue("accepted", null);
+        namedJdbcTemplate.update(
+                "INSERT INTO event_applications (eventid, creatorid, message, accepted)" +
+                        " VALUES (:eventId, :creatorId, :message, :accepted)", map);
+    }
+
+    public void inviteCreator(long creatorId, long organizerId, long eventId, String message){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("creatorId", creatorId);
+        map.addValue("organizerId", organizerId);
+        map.addValue("eventId", eventId);
+        map.addValue("message", message);
+        namedJdbcTemplate.update(
+                "INSERT INTO creators_invites (creatorid, organizerid, eventid, message, accepted)" +
+                        " VALUES (:creatorId, :organizerId, :eventId, :message, NULL)", map);
+    }
+
+    public void answerInvitation(long creatorId, long eventId, boolean accept){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("creatorId", creatorId);
+        map.addValue("eventId", eventId);
+        map.addValue("accept", accept);
+        namedJdbcTemplate.update(
+                "UPDATE creators_invites SET accepted = :accept " +
+                        "WHERE creatorid = :creatorId AND eventid = :eventId"
+                , map);
+    }
+
+    public void answerApplication(long eventId, long creatorId, boolean accept){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("creatorId", creatorId);
+        map.addValue("eventId", eventId);
+        map.addValue("accept", accept);
+        namedJdbcTemplate.update(
+                "UPDATE event_applications SET accepted = :accept " +
+                        "WHERE creatorid = :creatorId AND eventid = :eventId",
+                map);
     }
 }

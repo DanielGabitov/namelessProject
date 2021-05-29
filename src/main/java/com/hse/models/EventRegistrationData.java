@@ -15,6 +15,7 @@ public class EventRegistrationData {
 
     private String name;
     private String description;
+    private long organizerId;
     private float rating;
     private String geoData;
     private Specialization specialization;

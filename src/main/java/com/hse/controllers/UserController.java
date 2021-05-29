@@ -1,7 +1,9 @@
 package com.hse.controllers;
 
 import com.hse.models.Event;
+import com.hse.models.Notification;
 import com.hse.models.User;
+import com.hse.services.NotificationService;
 import com.hse.services.UserService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +19,12 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, NotificationService notificationService) {
         this.userService = userService;
+        this.notificationService = notificationService;
     }
 
     @GetMapping(value = "/{id}", produces = {"application/json"})
@@ -59,10 +63,17 @@ public class UserController {
         return new ResponseEntity<>(userService.checkLike(userId, eventId), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/{userId}/{eventId}/applications", consumes = {"application/json"})
-    @ApiOperation(value = "", nickname = "Send application for event participation", tags = {"User"})
-    public ResponseEntity<String> sendApplication(  @PathVariable("userId") long userId,
-                                                    @PathVariable("eventId") long eventId) {
-        return new ResponseEntity<>("", HttpStatus.OK);
+    @GetMapping(value = "/{userId}/notifications")
+    @ApiOperation(value = "", nickname = "Возвращает уведомления пользователя", tags = {"User"})
+    public ResponseEntity<List<Notification>> getUserNotifications(@PathVariable("userId") long userId) {
+        return new ResponseEntity<>(notificationService.getUserNotifications(userId), HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/{userId}/notifications", consumes = {"application/json"})
+    @ApiOperation(value = "", nickname = "Принимает JSON с массивом ID'шников уведомлений, которые нужно удалить",
+            tags = {"User"})
+    public ResponseEntity<String> deleteNotifications(@PathVariable("userId") long userId, @RequestBody List<Long> notificationIds) {
+        notificationService.deleteNotifications(notificationIds);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
