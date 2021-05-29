@@ -1,8 +1,8 @@
 CREATE TABLE events_participants
 (
-    eventID bigint NOT NULL,
-    userID  bigint NOT NULL,
-    PRIMARY KEY (eventId, userId)
+    eventId       bigint NOT NULL,
+    participantId bigint NOT NULL,
+    PRIMARY KEY (eventId, participantId)
 );
 
 CREATE TABLE events_images
@@ -33,11 +33,11 @@ CREATE TABLE users_subscriptions
 
 CREATE TABLE creators_invites
 (
-    creatorId bigint NOT NULL,
-    organizerId bigint NOT NULL ,
-    eventId bigint NOT NULL ,
-    message text,
-    accepted bool
+    creatorId   bigint NOT NULL,
+    organizerId bigint NOT NULL,
+    eventId     bigint NOT NULL,
+    message     text,
+    accepted    bool
 );
 
 CREATE TABLE event_applications

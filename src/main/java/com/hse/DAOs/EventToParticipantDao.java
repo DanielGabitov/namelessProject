@@ -30,6 +30,6 @@ public class EventToParticipantDao {
         map.addValue("eventId", eventId);
 
         return namedJdbcTemplate.query("SELECT * from events_participants WHERE eventId = :eventId", map,
-                (resultSet, i) -> resultSet.getLong("userId"));
+                (resultSet, i) -> resultSet.getLong("participantId"));
     }
 }

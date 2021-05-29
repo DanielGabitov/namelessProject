@@ -85,7 +85,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{userId}/events/{eventId}/participants")
+    @DeleteMapping(value = "/{userId}/events/{eventId}/participants")
     @ApiOperation(value = "", nickname = "", tags = {"User"})
     public ResponseEntity<String> cancelParticipation(@PathVariable("userId") long userId,
                                                       @PathVariable("eventId") long eventId){

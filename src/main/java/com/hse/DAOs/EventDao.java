@@ -103,8 +103,8 @@ public class EventDao {
         map.addValue("eventId", eventId);
         map.addValue("participantId", participantId);
         namedJdbcTemplate.update(
-                "INSERT INTO events_participants (eventid, userid) " +
-                    "VALUES (:eventId, :userId)", map);
+                "INSERT INTO events_participants (eventid, participantId) " +
+                    "VALUES (:eventId, :participantId)", map);
     }
 
     public void deleteParticipant(long eventId, long participantId){
@@ -112,7 +112,7 @@ public class EventDao {
         map.addValue("eventId", eventId);
         map.addValue("participantId", participantId);
         namedJdbcTemplate.update(
-                "DELETE FROM events_participants WHERE eventid = :eventId AND userid = :userId", map);
+                "DELETE FROM events_participants WHERE eventid = :eventId AND participantid = :participantId", map);
     }
 
     public boolean checkParticipant(long eventId, long participantId){
@@ -120,8 +120,8 @@ public class EventDao {
         map.addValue("eventId", eventId);
         map.addValue("participantId", participantId);
         Integer count = namedJdbcTemplate.queryForObject(
-                "SELECT count(userId) FROM events_participants " +
-                    "WHERE eventid = :eventId AND userId = :userId", map, Integer.class);
+                "SELECT count(participantid) FROM events_participants " +
+                    "WHERE eventid = :eventId AND participantid = :participantId", map, Integer.class);
         return count != null && count > 0;
     }
 }
