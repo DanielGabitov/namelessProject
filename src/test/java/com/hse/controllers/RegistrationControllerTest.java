@@ -24,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @TestPropertySource("/application-test.properties")
-@Sql(value = {"/scripts/before-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class RegistrationControllerTest {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
@@ -36,10 +35,11 @@ public class RegistrationControllerTest {
     }
 
 //    @Test
+//    @Sql(value = {"/scripts/before-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 //    public void testRegistrationUser() throws Exception {
 //        UserRegistrationData userRegistrationData = new UserRegistrationData(UserRole.USER, "name",
 //                "name", "name", "username", "password",
-//                Specialization.ART, 1, "description", new ArrayList<>());
+//                Specialization.ART, "description", new ArrayList<>());
 //
 //
 //        mockMvc.perform(
@@ -50,11 +50,12 @@ public class RegistrationControllerTest {
 //    }
 //
 //    @Test
-//    @Sql(value = {"/scripts/create-user.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+//    @Sql(value = {"/scripts/before-test.sql", "/scripts/create-user.sql"},
+//            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 //    public void testFailRegistrationUser() throws Exception {
 //        UserRegistrationData userRegistrationData = new UserRegistrationData(UserRole.USER, "name",
 //                "name", "name", "username", "password",
-//                Specialization.ART, 1, "description", new ArrayList<>());
+//                Specialization.ART, "description", new ArrayList<>());
 //
 //
 //        mockMvc.perform(

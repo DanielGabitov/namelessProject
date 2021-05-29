@@ -24,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @TestPropertySource("/application-test.properties")
-@Sql(value = {"/scripts/before-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class AuthenticationControllerTest {
     private final MockMvc mockMvc;
 
@@ -34,7 +33,8 @@ public class AuthenticationControllerTest {
     }
 
 //    @Test
-//    @Sql(value = {"/scripts/create-user.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+//    @Sql(value = {"/scripts/before-test.sql", "/scripts/create-user.sql"},
+//            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 //    public void testAuthentication() throws Exception {
 //        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
 //        map.put("username", List.of("username"));
@@ -51,6 +51,7 @@ public class AuthenticationControllerTest {
 //    }
 //
 //    @Test
+//    @Sql(value = {"/scripts/before-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 //    public void testFailAuthentication() throws Exception {
 //        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
 //        map.put("username", List.of("username"));

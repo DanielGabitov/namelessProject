@@ -41,7 +41,7 @@ public class LikesDao {
         map.addValue("userId", userId);
         map.addValue("eventId", eventId);
 
-        namedJdbcTemplate.update("DELETE FROM likes WHERE eventId = :eventId and userId = :usedId", map);
+        namedJdbcTemplate.update("DELETE FROM likes WHERE eventId = :eventId AND userId = :usedId", map);
     }
 
     public List<Long> getEventLikes(long eventId) {
