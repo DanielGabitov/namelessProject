@@ -47,7 +47,9 @@ public class EventService {
 
     @Transactional
     public void updateEvent(long eventId, Event event) {
-        assert getEvent(eventId) != null;
+        if (!eventDAO.checkEvent(eventId)) {
+            throw new ServiceException(HttpStatus.BAD_REQUEST, "There is no event with such id.");
+        }
         eventDAO.updateEvent(eventId, event);
         eventToParticipantDAO.deleteParticipants(eventId);
         addParticipants(eventId, event.getParticipantsIDs());

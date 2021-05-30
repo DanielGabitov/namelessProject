@@ -78,7 +78,9 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void updateUser(long userId, User newUser) {
-        assert loadUserById(userId) != null;
+        if (!userDAO.checkUser(userId)) {
+            throw new ServiceException(HttpStatus.BAD_REQUEST, "There is no user with such id.");
+        }
         userDAO.updateUser(newUser);
         List<String> userImages = userToImagesDAO.getImages(userId);
         ImageService.deleteImages(userImages);

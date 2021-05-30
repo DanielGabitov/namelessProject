@@ -32,6 +32,14 @@ public class EventDao {
         this.applicationMapper = applicationMapper;
     }
 
+    public boolean checkEvent(long eventId) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("id", eventId);
+
+        Integer count = namedJdbcTemplate.queryForObject(
+                "SELECT count(id) FROM events WHERE id = :id", map, Integer.class);
+        return count != null && count > 0;
+    }
 
     public Optional<Event> getEvent(long id) {
         MapSqlParameterSource map = new MapSqlParameterSource();

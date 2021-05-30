@@ -35,6 +35,15 @@ public class UserDao {
         this.inviteMapper = inviteMapper;
     }
 
+    public boolean checkUser(long userId) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("id", userId);
+
+        Integer count = namedJdbcTemplate.queryForObject(
+                "SELECT count(id) FROM users WHERE id = :id", map, Integer.class);
+        return count != null && count > 0;
+    }
+
     public Optional<User> getUserById(Long userId) throws IllegalArgumentException {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("id", userId);
