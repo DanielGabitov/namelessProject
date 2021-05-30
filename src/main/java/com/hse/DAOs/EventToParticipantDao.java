@@ -25,6 +25,13 @@ public class EventToParticipantDao {
         namedJdbcTemplate.update("INSERT INTO events_participants (eventId, userId) VALUES (:eventId, :userId)", map);
     }
 
+    public void deleteParticipants(long eventId) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("eventId", eventId);
+
+        namedJdbcTemplate.update("DELETE FROM events_participants WHERE eventid = :eventId", map);
+    }
+
     public List<Long> getParticipants(long eventId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("eventId", eventId);

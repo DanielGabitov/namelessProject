@@ -47,11 +47,9 @@ public class EventService {
 
     @Transactional
     public void updateEvent(long eventId, Event event) {
-        Event pastEvent = getEvent(eventId);
-        if (eventId != pastEvent.getId()) {
-            throw new ServiceException(HttpStatus.BAD_REQUEST, "Event IDs don't match.");
-        }
+        assert getEvent(eventId) != null;
         eventDAO.updateEvent(eventId, event);
+        eventToParticipantDAO.deleteParticipants(eventId);
         addParticipants(eventId, event.getParticipantsIDs());
         List<String> eventImages = eventToImagesDAO.getImages(eventId);
         ImageService.deleteImages(eventImages);

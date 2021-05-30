@@ -78,10 +78,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void updateUser(long userId, User newUser) {
-        User pastUser = loadUserById(userId);
-        if (pastUser.getId() != newUser.getId()) {
-            throw new ServiceException(HttpStatus.BAD_REQUEST, "You cannot update another user.");
-        }
+        assert loadUserById(userId) != null;
         userDAO.updateUser(newUser);
         List<String> userImages = userToImagesDAO.getImages(userId);
         ImageService.deleteImages(userImages);
