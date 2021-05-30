@@ -28,4 +28,10 @@ public class EventToImagesDao {
         return namedJdbcTemplate.query("SELECT * from events_images WHERE eventId = :eventId", map,
                 (resultSet, i) -> resultSet.getString("image"));
     }
+
+    public void deleteEventImages(long eventId) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("eventId", eventId);
+        namedJdbcTemplate.update("DELETE FROM events_images WHERE eventId = :eventId", map);
+    }
 }

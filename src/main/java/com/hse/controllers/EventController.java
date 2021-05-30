@@ -33,14 +33,21 @@ public class EventController {
         return new ResponseEntity<>("Event has been added", HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{id}", produces = {"application/json"})
+    @PutMapping(value = "/{eventId}", consumes = {"application/json"})
+    @ApiOperation(value = "", nickname = "Update event.", tags = {"Events"})
+    public ResponseEntity<String> updateEvent(@PathVariable("eventId") long eventId, @RequestBody Event event) {
+        eventService.updateEvent(eventId, event);
+        return new ResponseEntity<>("Event has been updated", HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{eventId}", produces = {"application/json"})
     @ApiOperation(value = "", nickname = "Get event.", tags = {"Events"})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 404, message = "Internal serverError")}
     )
-    public ResponseEntity<Event> getEvent(@PathVariable("id") long id) {
-        Event event = eventService.getEvent(id);
+    public ResponseEntity<Event> getEvent(@PathVariable("eventId") long eventId) {
+        Event event = eventService.getEvent(eventId);
         return new ResponseEntity<>(event, HttpStatus.OK);
     }
 }

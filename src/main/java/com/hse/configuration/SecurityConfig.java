@@ -37,6 +37,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/images/**").hasAnyRole(UserRole.USER.name(), UserRole.CREATOR.name(), UserRole.ORGANIZER.name())
                 .antMatchers("/api/feed/**").hasAnyRole(UserRole.USER.name(), UserRole.CREATOR.name(), UserRole.ORGANIZER.name())
                 .antMatchers("/api/subscriptions/**").hasAnyRole(UserRole.USER.name(), UserRole.CREATOR.name(), UserRole.ORGANIZER.name())
+                .antMatchers("/api/organizers/**").hasAnyRole(UserRole.ORGANIZER.name())
+                .antMatchers("/api/creators/**").hasAnyRole(UserRole.CREATOR.name())
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

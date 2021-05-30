@@ -76,6 +76,25 @@ public class UserDao {
         return (long) keyHolder.getKeyList().get(0).get("id");
     }
 
+    public void updateUser(User newUser) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("userRole", newUser.getUserRole().name());
+        map.addValue("firstName", newUser.getFirstName());
+        map.addValue("lastName", newUser.getLastName());
+        map.addValue("patronymic", newUser.getPatronymic());
+        map.addValue("userName", newUser.getUsername());
+        map.addValue("password", newUser.getPassword());
+        map.addValue("specialization", newUser.getSpecialization().name());
+        map.addValue("rating", newUser.getRating());
+        map.addValue("description", newUser.getDescription());
+
+        namedJdbcTemplate.update(
+                "UPDATE users SET userrole = :userRole, firstname = :firstName, lastname = :lastName, " +
+                        "patronymic = :patronymic, username = :userName, password = :password, " +
+                        "specialization = :specialization, rating = :rating, description = :description " +
+                        "WHERE username = :userName", map);
+    }
+
     public List<User> getCreators(int offset, int size) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("offset", offset);

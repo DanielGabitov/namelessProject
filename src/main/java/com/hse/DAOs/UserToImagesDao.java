@@ -28,4 +28,10 @@ public class UserToImagesDao {
         return namedJdbcTemplate.query("SELECT * from users_images WHERE userId = :userId", map,
                 (resultSet, i) -> resultSet.getString("image"));
     }
+
+    public void deleteUserImages(long userId) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("userId", userId);
+        namedJdbcTemplate.update("DELETE FROM users_images WHERE userId = :userId", map);
+    }
 }

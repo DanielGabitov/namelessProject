@@ -51,6 +51,10 @@ public class ImageService {
         return Coder.decode(encodedImage);
     }
 
+    public static void deleteImages(List<String> imageUUIDs) {
+        imageUUIDs.forEach(FileSystemInteractor::deleteImage);
+    }
+
     public void saveImages(ImageRegistrationData imageRegistrationData) {
         List<String> imageUUIDs = ImageService.saveImagesToFileSystem(imageRegistrationData.getImages());
         long destinationId = imageRegistrationData.getDestinationId();
