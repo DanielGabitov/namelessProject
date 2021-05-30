@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -20,6 +21,15 @@ public class FileSystemInteractor {
             FileUtils.writeByteArrayToFile(imageFile, data);
         } catch (IOException e) {
             throw new FileSystemException("Failed to save image", e);
+        }
+    }
+
+    public static void deleteImage(String fileName) {
+        Path imageFile = IMAGE_DIRECTORY.resolve(fileName);
+        try {
+            Files.delete(imageFile);
+        } catch (IOException exception) {
+            throw new FileSystemException("Failed to delete image", exception);
         }
     }
 

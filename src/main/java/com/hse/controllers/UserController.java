@@ -27,6 +27,14 @@ public class UserController {
         this.notificationService = notificationService;
     }
 
+    @PutMapping(value = "/{userId}", consumes = {"application/json"})
+    @ApiOperation(value = "", nickname = "Update user.", tags = {"User"})
+    public ResponseEntity<String> updateUser(@PathVariable("userId") long userId,
+                                             @RequestBody User user) {
+        userService.updateUser(userId, user);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @GetMapping(value = "/{id}", produces = {"application/json"})
     @ApiOperation(value = "", nickname = "Get new user.", tags = {"User"})
     public ResponseEntity<User> getUser(@PathVariable("id") Long userId) {

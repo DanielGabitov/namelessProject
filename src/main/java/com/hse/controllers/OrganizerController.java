@@ -1,6 +1,7 @@
 package com.hse.controllers;
 
 import com.hse.models.Application;
+import com.hse.models.Event;
 import com.hse.services.UserService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,5 +46,17 @@ public class OrganizerController {
     @ApiOperation(value = "", nickname = "", tags = {"User"})
     public ResponseEntity<List<Application>> getOrganizerApplications(@PathVariable("organizerId") long organizerId) {
         return new ResponseEntity<>(userService.getOrganizerApplications(organizerId), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{organizerId}/passedEvents", produces = {"application/json"})
+    @ApiOperation(value = "", nickname = "Get all passed organizer events" ,tags = {"User"})
+    public ResponseEntity<List<Event>> getAllPassedOrganizerEvents(@PathVariable("organizerId") long organizerId) {
+        return new ResponseEntity<>(userService.getAllPassedOrganizerEvents(organizerId), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{organizerId}/futureEvents", produces = {"application/json"})
+    @ApiOperation(value = "", nickname = "Get all future organizer events" ,tags = {"User"})
+    public ResponseEntity<List<Event>> getAllFutureOrganizerEvents(@PathVariable("organizerId") long organizerId) {
+        return new ResponseEntity<>(userService.getAllFutureOrganizerEvents(organizerId), HttpStatus.OK);
     }
 }

@@ -4,13 +4,13 @@ import com.hse.DAOs.EventDao;
 import com.hse.DAOs.LikesDao;
 import com.hse.DAOs.UserDao;
 import com.hse.DAOs.UserToImagesDao;
+import com.hse.enums.UserRole;
 import com.hse.exceptions.ServiceException;
 import com.hse.models.*;
 import com.hse.systems.FileSystemInteractor;
 import com.hse.utils.Coder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
@@ -44,7 +44,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public User loadUserByUsername(String username) {
         User user = userDAO.getUserByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("There is no user with this username."));
         user.setImages(getImages(user.getId()));
@@ -73,6 +73,19 @@ public class UserService implements UserDetailsService {
         User user = readRegistrationData(userRegistrationData);
         long userId = userDAO.saveUser(user);
         List<String> imageUUIDs = ImageService.saveImagesToFileSystem(userRegistrationData.getImages());
+        addImages(userId, imageUUIDs);
+    }
+
+    @Transactional
+    public void updateUser(long userId, User newUser) {
+        if (!userDAO.checkUser(userId)) {
+            throw new ServiceException(HttpStatus.BAD_REQUEST, "There is no user with such id.");
+        }
+        userDAO.updateUser(newUser);
+        List<String> userImages = userToImagesDAO.getImages(userId);
+        ImageService.deleteImages(userImages);
+        userToImagesDAO.deleteUserImages(userId);
+        List<String> imageUUIDs = ImageService.saveImagesToFileSystem(newUser.getImages());
         addImages(userId, imageUUIDs);
     }
 
@@ -170,24 +183,32 @@ public class UserService implements UserDetailsService {
                 .collect(Collectors.toList());
     }
 
-    public void participate(long userId, long eventId){
-        if (eventDao.checkParticipant(eventId, userId)){
+    public void participate(long userId, long eventId) {
+        if (eventDao.checkParticipant(eventId, userId)) {
             String exceptionMessage = "User " + userId + " already participate in event " + eventId;
             throw new ServiceException(HttpStatus.BAD_REQUEST, exceptionMessage);
         }
         eventDao.addParticipant(eventId, userId);
     }
 
-    public void cancelParticipation(long userId, long eventId){
-        if (!eventDao.checkParticipant(eventId, userId)){
+    public void cancelParticipation(long userId, long eventId) {
+        if (!eventDao.checkParticipant(eventId, userId)) {
             String exceptionMessage = "User " + userId + " do not participate in event " + eventId;
             throw new ServiceException(HttpStatus.BAD_REQUEST, exceptionMessage);
         }
         eventDao.deleteParticipant(eventId, userId);
     }
 
-    public boolean checkParticipation(long userId, long eventId){
-        return eventDao.checkParticipant(eventId, userId);
+    public List<Event> getAllPassedOrganizerEvents(long organizerId) {
+        return eventDao.getAllPassedOrganizerEvents(organizerId).stream()
+                .peek(eventService::setEventDataFromOtherTables)
+                .collect(Collectors.toList());
+    }
+
+    public List<Event> getAllFutureOrganizerEvents(long organizerId) {
+        return eventDao.getAllFutureOrganizerEvents(organizerId).stream()
+                .peek(eventService::setEventDataFromOtherTables)
+                .collect(Collectors.toList());
     }
 
     private User readRegistrationData(UserRegistrationData data) {

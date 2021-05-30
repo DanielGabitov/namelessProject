@@ -46,6 +46,21 @@ public class EventService {
     }
 
     @Transactional
+    public void updateEvent(long eventId, Event event) {
+        if (!eventDAO.checkEvent(eventId)) {
+            throw new ServiceException(HttpStatus.BAD_REQUEST, "There is no event with such id.");
+        }
+        eventDAO.updateEvent(eventId, event);
+        eventToParticipantDAO.deleteParticipants(eventId);
+        addParticipants(eventId, event.getParticipantsIDs());
+        List<String> eventImages = eventToImagesDAO.getImages(eventId);
+        ImageService.deleteImages(eventImages);
+        eventToImagesDAO.deleteEventImages(eventId);
+        List<String> imageUUIDs = ImageService.saveImagesToFileSystem(event.getImages());
+        addImages(eventId, imageUUIDs);
+    }
+
+    @Transactional
     public Event getEvent(long eventId) {
         Event event = getEventFromEventTable(eventId);
         setEventDataFromOtherTables(event);
@@ -104,7 +119,7 @@ public class EventService {
         event.setGeoData(data.getGeoData());
         event.setSpecialization(data.getSpecialization());
         event.setDate(data.getDate());
-
+        event.setOrganizerId(data.getOrganizerId());
         event.setLikes(List.of());
         event.setImages(List.of());
         event.setParticipantsIDs(List.of());
