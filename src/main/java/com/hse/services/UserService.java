@@ -202,6 +202,20 @@ public class UserService implements UserDetailsService {
                 .collect(Collectors.toList());
     }
 
+    public List<Event> getAllFutureParticipations(long userId){
+        return eventDao.getAllFutureEvents(eventToParticipantDao.getUserParticipations(userId))
+                .stream()
+                .peek(eventService::setEventDataFromOtherTables)
+                .collect(Collectors.toList());
+    }
+
+    public List<Event> getAllPassedParticipations(long userId){
+        return eventDao.getAllPassedEvents(eventToParticipantDao.getUserParticipations(userId))
+                .stream()
+                .peek(eventService::setEventDataFromOtherTables)
+                .collect(Collectors.toList());
+    }
+
     public boolean checkParticipation(long userId, long eventId){
         return eventToParticipantDao.checkParticipation(eventId, userId);
     }

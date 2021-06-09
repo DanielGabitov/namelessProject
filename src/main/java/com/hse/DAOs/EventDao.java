@@ -89,6 +89,24 @@ public class EventDao {
                         "WHERE id = :id", map);
     }
 
+    public List<Event> getAllFutureEvents(List<Long> eventIds){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("events", eventIds);
+
+        return namedJdbcTemplate.query("SELECT * from events WHERE id IN (:events) AND date > now()",
+                map,
+                eventMapper);
+    }
+
+    public List<Event> getAllPassedEvents(List<Long> eventIds){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("events", eventIds);
+
+        return namedJdbcTemplate.query("SELECT * from events WHERE id IN (:events) AND date < now()",
+                map,
+                eventMapper);
+    }
+
     public List<Event> getAllPassedOrganizerEvents(long organizerId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("organizerId", organizerId);

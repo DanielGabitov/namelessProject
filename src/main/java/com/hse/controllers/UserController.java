@@ -106,6 +106,18 @@ public class UserController {
         return new ResponseEntity<>(userService.getUserParticipations(userId), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/{userId}/participations/future", produces = {"application/json"})
+    @ApiOperation(value = "", nickname = "Get future events in which user participate.", tags = {"User"})
+    public ResponseEntity<List<Event>> getFutureUserParticipations(@PathVariable("userId") long userId) {
+        return new ResponseEntity<>(userService.getAllFutureParticipations(userId), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{userId}/participations/passed", produces = {"application/json"})
+    @ApiOperation(value = "", nickname = "Get passed events in which user participate.", tags = {"User"})
+    public ResponseEntity<List<Event>> getPassedUserParticipations(@PathVariable("userId") long userId) {
+        return new ResponseEntity<>(userService.getAllPassedParticipations(userId), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/{userId}/participations/{eventId}", produces = {"application/json"})
     @ApiOperation(value = "", nickname = "Check if user participate in event with eventId.", tags = {"User"})
     public ResponseEntity<Boolean> checkParticipation(@PathVariable("userId") long userId,
