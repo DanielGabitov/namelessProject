@@ -153,6 +153,15 @@ public class EventDao {
                 (resultSet, i) -> resultSet.getLong("id"));
     }
 
+    public List<Long> getCreatorApplicationEvents(long creatorId){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("creatorId", creatorId);
+
+        return namedJdbcTemplate.query("SELECT * from event_applications WHERE creatorid = :creatorId",
+                map,
+                (resultSet, i) -> resultSet.getLong("eventId"));
+    }
+
     public List<Application> getEventApplications(long eventId){
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("eventId", eventId);

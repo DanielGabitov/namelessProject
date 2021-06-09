@@ -18,21 +18,21 @@ import java.util.stream.Collectors;
 
 @Component
 public class EventService {
-    private final EventDao eventDAO;
-    private final EventToParticipantDao eventToParticipantDAO;
-    private final EventToImagesDao eventToImagesDAO;
-    private final LikesDao likesDAO;
+    private final EventDao eventDao;
+    private final EventToParticipantDao eventToParticipantDao;
+    private final EventToImagesDao eventToImagesDao;
+    private final LikesDao likesDao;
 
     private final UserService userService;
 
     @Autowired
-    public EventService(EventDao eventDAO, EventToParticipantDao eventToParticipantDAO,
-                        EventToImagesDao eventToImagesDAO, LikesDao likesDao, UserService userService) {
+    public EventService(EventDao eventDao, EventToParticipantDao eventToParticipantDao,
+                        EventToImagesDao eventToImagesDao, LikesDao likesDao, UserService userService) {
 
-        this.eventDAO = eventDAO;
-        this.eventToParticipantDAO = eventToParticipantDAO;
-        this.eventToImagesDAO = eventToImagesDAO;
-        this.likesDAO = likesDao;
+        this.eventDao = eventDao;
+        this.eventToParticipantDao = eventToParticipantDao;
+        this.eventToImagesDao = eventToImagesDao;
+        this.likesDao = likesDao;
 
         this.userService = userService;
     }
@@ -40,7 +40,7 @@ public class EventService {
     @Transactional
     public void createEvent(EventRegistrationData eventRegistrationData) {
         Event event = readRegistrationData(eventRegistrationData);
-        long eventId = eventDAO.createEvent(event);
+        long eventId = eventDao.createEvent(event);
         addParticipants(eventId, event.getParticipantsIDs());
         List<String> imageUUIDs = ImageService.saveImagesToFileSystem(eventRegistrationData.getImages());
         addImages(eventId, imageUUIDs);
@@ -48,15 +48,15 @@ public class EventService {
 
     @Transactional
     public void updateEvent(long eventId, Event event) {
-        if (!eventDAO.checkEvent(eventId)) {
+        if (!eventDao.checkEvent(eventId)) {
             throw new ServiceException(HttpStatus.BAD_REQUEST, "There is no event with such id.");
         }
-        eventDAO.updateEvent(eventId, event);
-        eventToParticipantDAO.deleteParticipants(eventId);
+        eventDao.updateEvent(eventId, event);
+        eventToParticipantDao.deleteParticipants(eventId);
         addParticipants(eventId, event.getParticipantsIDs());
-        List<String> eventImages = eventToImagesDAO.getImages(eventId);
+        List<String> eventImages = eventToImagesDao.getImages(eventId);
         ImageService.deleteImages(eventImages);
-        eventToImagesDAO.deleteEventImages(eventId);
+        eventToImagesDao.deleteEventImages(eventId);
         List<String> imageUUIDs = ImageService.saveImagesToFileSystem(event.getImages());
         addImages(eventId, imageUUIDs);
     }
@@ -69,7 +69,7 @@ public class EventService {
     }
 
     private Event getEventFromEventTable(long eventId){
-        return eventDAO.getEvent(eventId).orElseThrow(
+        return eventDao.getEvent(eventId).orElseThrow(
                 () -> new ServiceException(HttpStatus.BAD_REQUEST, "Failed to find event with given ID.")
         );
     }
@@ -86,11 +86,11 @@ public class EventService {
     }
 
     public void addParticipants(long eventId, List<Long> participants) {
-        participants.forEach(participant -> eventToParticipantDAO.addParticipant(eventId, participant));
+        participants.forEach(participant -> eventToParticipantDao.addParticipant(eventId, participant));
     }
 
     public List<Long> getParticipantsIds(long eventId) {
-        return eventToParticipantDAO.getParticipants(eventId);
+        return eventToParticipantDao.getParticipants(eventId);
     }
 
     public List<User> getParticipants(long eventId){
@@ -98,22 +98,34 @@ public class EventService {
     }
 
     public void addImages(long eventId, List<String> imageUUIDs) {
-        imageUUIDs.forEach(image -> eventToImagesDAO.addImage(eventId, image));
+        imageUUIDs.forEach(image -> eventToImagesDao.addImage(eventId, image));
     }
 
     public List<String> getImages(long eventId) {
-        return eventToImagesDAO.getImages(eventId).stream()
+        return eventToImagesDao.getImages(eventId).stream()
                 .map(FileSystemInteractor::getImage)
                 .map(Coder::encode)
                 .collect(Collectors.toList());
     }
 
     public List<Long> getLikes(long eventId) {
-        return likesDAO.getEventLikes(eventId);
+        return likesDao.getEventLikes(eventId);
     }
 
     public List<Application> getEventApplications(long eventId){
-        return eventDAO.getEventApplications(eventId);
+        return eventDao.getEventApplications(eventId);
+    }
+
+    public List<Event> getFutureEvents(List<Long> eventIds){
+        return eventDao.getAllFutureEvents(eventIds).stream()
+                .peek(this::setEventDataFromOtherTables)
+                .collect(Collectors.toList());
+    }
+
+    public List<Event> getPassedEvents(List<Long> eventIds){
+        return eventDao.getAllPassedEvents(eventIds).stream()
+                .peek(this::setEventDataFromOtherTables)
+                .collect(Collectors.toList());
     }
 
     private Event readRegistrationData(EventRegistrationData data) {

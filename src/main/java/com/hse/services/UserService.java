@@ -173,6 +173,30 @@ public class UserService implements UserDetailsService {
         return userDao.getCreatorInvitations(creatorId);
     }
 
+    public List<Event> getFutureEventsCreatorInvitations(long creatorId) {
+        List<Long> eventIds = userDao.getCreatorInvitations(creatorId).stream()
+                .map(Invitation::getEventId)
+                .collect(Collectors.toList());
+        return eventService.getFutureEvents(eventIds);
+    }
+
+    public List<Event> getPassedEventsCreatorInvitations(long creatorId) {
+        List<Long> eventIds = userDao.getCreatorInvitations(creatorId).stream()
+                .map(Invitation::getEventId)
+                .collect(Collectors.toList());
+        return eventService.getPassedEvents(eventIds);
+    }
+
+    public List<Event> getFutureEventsCreatorApplications(long creatorId) {
+        List<Long> eventIds = eventDao.getCreatorApplicationEvents(creatorId);
+        return eventService.getFutureEvents(eventIds);
+    }
+
+    public List<Event> getPassedEventsCreatorApplications(long creatorId) {
+        List<Long> eventIds = eventDao.getCreatorApplicationEvents(creatorId);
+        return eventService.getPassedEvents(eventIds);
+    }
+
     public List<Application> getOrganizerApplications(long organizerId) {
         return eventDao.getOrganizerEvents(organizerId).stream()
                 .map(eventService::getEventApplications)

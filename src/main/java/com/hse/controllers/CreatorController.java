@@ -1,5 +1,6 @@
 package com.hse.controllers;
 
+import com.hse.models.Event;
 import com.hse.models.Invitation;
 import com.hse.services.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -43,5 +44,29 @@ public class CreatorController {
     @ApiOperation(value = "", nickname = "", tags = {"User"})
     public ResponseEntity<List<Invitation>> getCreatorInvitations(@PathVariable("creatorId") long creatorId) {
         return new ResponseEntity<>(userService.getCreatorInvitations(creatorId), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{creatorId}/invitations/futureEvents")
+    @ApiOperation(value = "", nickname = "", tags = {"User"})
+    public ResponseEntity<List<Event>> getCreatorFutureEventsInvitations(@PathVariable("creatorId") long creatorId) {
+        return new ResponseEntity<>(userService.getFutureEventsCreatorInvitations(creatorId), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{creatorId}/invitations/passedEvents")
+    @ApiOperation(value = "", nickname = "", tags = {"User"})
+    public ResponseEntity<List<Event>> getCreatorPassedEventsInvitations(@PathVariable("creatorId") long creatorId) {
+        return new ResponseEntity<>(userService.getPassedEventsCreatorInvitations(creatorId), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{creatorId}/applications/futureEvents")
+    @ApiOperation(value = "", nickname = "", tags = {"User"})
+    public ResponseEntity<List<Event>> getCreatorFutureEventsApplications(@PathVariable("creatorId") long creatorId) {
+        return new ResponseEntity<>(userService.getFutureEventsCreatorApplications(creatorId), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{creatorId}/invitations/passedEvents")
+    @ApiOperation(value = "", nickname = "", tags = {"User"})
+    public ResponseEntity<List<Event>> getCreatorPassedEventsApplications(@PathVariable("creatorId") long creatorId) {
+        return new ResponseEntity<>(userService.getPassedEventsCreatorApplications(creatorId), HttpStatus.OK);
     }
 }
