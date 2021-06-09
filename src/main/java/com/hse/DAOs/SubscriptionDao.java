@@ -40,8 +40,7 @@ public class SubscriptionDao {
         map.addValue("subscriptionId", subscriptionId);
 
         namedJdbcTemplate.update(
-                "DELETE FROM users_subscriptions WHERE userId = :userId AND subscriptionId = :subscriptionId",
-                map);
+                "DELETE FROM users_subscriptions WHERE userId = :userId AND subscriptionId = :subscriptionId", map);
     }
 
     public List<Long> getAllSubscriptionIds(long userId) {

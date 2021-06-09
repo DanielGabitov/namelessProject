@@ -17,12 +17,14 @@ public class EventToParticipantDao {
         this.namedJdbcTemplate = namedJdbcTemplate;
     }
 
-    public void addParticipant(long eventId, long userId) {
+    public void addParticipant(long eventId, long participantId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("eventId", eventId);
-        map.addValue("userId", userId);
+        map.addValue("participantId", participantId);
 
-        namedJdbcTemplate.update("INSERT INTO events_participants (eventId, userId) VALUES (:eventId, :userId)", map);
+        namedJdbcTemplate.update(
+                "INSERT INTO events_participants (eventId, participantId) VALUES (:eventId, :userId)",
+                    map);
     }
 
     public void deleteParticipants(long eventId) {
@@ -38,5 +40,25 @@ public class EventToParticipantDao {
 
         return namedJdbcTemplate.query("SELECT * from events_participants WHERE eventId = :eventId", map,
                 (resultSet, i) -> resultSet.getLong("participantId"));
+    }
+
+    public List<Long> getUserParticipations(long userId) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("participantId", userId);
+
+        return namedJdbcTemplate.query("SELECT * from events_participants WHERE participantid = :participantId",
+                map,
+                (resultSet, i) -> resultSet.getLong("eventId"));
+    }
+
+    public boolean checkParticipation(long eventId, long participantId){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("eventId", eventId);
+        map.addValue("participantId", participantId);
+
+        return namedJdbcTemplate.query(
+                "SELECT * from events_participants WHERE eventid = :eventId AND participantid = :participantId",
+                    map, (resultSet, i) -> resultSet.getLong("eventId")
+        ).stream().findAny().isPresent();
     }
 }

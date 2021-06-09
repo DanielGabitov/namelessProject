@@ -38,8 +38,7 @@ public class UserController {
     @GetMapping(value = "/{id}", produces = {"application/json"})
     @ApiOperation(value = "", nickname = "Get new user.", tags = {"User"})
     public ResponseEntity<User> getUser(@PathVariable("id") Long userId) {
-        User user = userService.loadUserById(userId);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(userService.loadUserById(userId), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{userId}/likes")
@@ -99,5 +98,18 @@ public class UserController {
                                                       @PathVariable("eventId") long eventId){
         userService.cancelParticipation(userId, eventId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{userId}/participations", produces = {"application/json"})
+    @ApiOperation(value = "", nickname = "Get events in which user participate.", tags = {"User"})
+    public ResponseEntity<List<Event>> getUserParticipations(@PathVariable("userId") long userId) {
+        return new ResponseEntity<>(userService.getUserParticipations(userId), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{userId}/participations/{eventId}", produces = {"application/json"})
+    @ApiOperation(value = "", nickname = "Check if user participate in event with eventId.", tags = {"User"})
+    public ResponseEntity<Boolean> checkParticipation(@PathVariable("userId") long userId,
+                                                          @PathVariable("eventId") long eventId) {
+        return new ResponseEntity<>(userService.checkParticipation(userId, eventId), HttpStatus.OK);
     }
 }

@@ -5,6 +5,7 @@ import com.hse.exceptions.ServiceException;
 import com.hse.models.Application;
 import com.hse.models.Event;
 import com.hse.models.EventRegistrationData;
+import com.hse.models.User;
 import com.hse.systems.FileSystemInteractor;
 import com.hse.utils.Coder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,27 +14,27 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 public class EventService {
     private final EventDao eventDAO;
-    private final EventToOrganizerDao eventToOrganizerDAO;
     private final EventToParticipantDao eventToParticipantDAO;
     private final EventToImagesDao eventToImagesDAO;
     private final LikesDao likesDAO;
 
+    private final UserService userService;
+
     @Autowired
-    public EventService(EventDao eventDAO, EventToOrganizerDao eventToOrganizerDAO,
-                        EventToParticipantDao eventToParticipantDAO, EventToImagesDao eventToImagesDAO,
-                        LikesDao likesDao) {
+    public EventService(EventDao eventDAO, EventToParticipantDao eventToParticipantDAO,
+                        EventToImagesDao eventToImagesDAO, LikesDao likesDao, UserService userService) {
 
         this.eventDAO = eventDAO;
-        this.eventToOrganizerDAO = eventToOrganizerDAO;
         this.eventToParticipantDAO = eventToParticipantDAO;
         this.eventToImagesDAO = eventToImagesDAO;
         this.likesDAO = likesDao;
+
+        this.userService = userService;
     }
 
     @Transactional
@@ -79,7 +80,7 @@ public class EventService {
 
     public void setEventDataFromOtherTables(Event event) {
         Long id = event.getId();
-        event.setParticipantsIDs(getParticipants(id));
+        event.setParticipantsIDs(getParticipantsIds(id));
         event.setImages(getImages(id));
         event.setLikes(getLikes(id));
     }
@@ -88,8 +89,12 @@ public class EventService {
         participants.forEach(participant -> eventToParticipantDAO.addParticipant(eventId, participant));
     }
 
-    public List<Long> getParticipants(long eventId) {
+    public List<Long> getParticipantsIds(long eventId) {
         return eventToParticipantDAO.getParticipants(eventId);
+    }
+
+    public List<User> getParticipants(long eventId){
+        return getParticipantsIds(eventId).stream().map(userService::loadUserById).collect(Collectors.toList());
     }
 
     public void addImages(long eventId, List<String> imageUUIDs) {

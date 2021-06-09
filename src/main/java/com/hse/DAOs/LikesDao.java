@@ -50,13 +50,7 @@ public class LikesDao {
         map.addValue("eventId", eventId);
 
         return namedJdbcTemplate.query("SELECT * from likes WHERE eventId = :eventId", map,
-                resultSet -> {
-                    List<Long> users = new ArrayList<>();
-                    while (resultSet.next()) {
-                        users.add(resultSet.getLong("userId"));
-                    }
-                    return users;
-                });
+                (resultSet, i) -> resultSet.getLong("userId"));
     }
 
     public List<Long> getUserLikes(long userId) {
@@ -64,6 +58,6 @@ public class LikesDao {
         map.addValue("userId", userId);
 
         return namedJdbcTemplate.query("SELECT * from likes WHERE userId = :userId", map,
-                (resultSet, i) -> resultSet.getLong("userId"));
+                (resultSet, i) -> resultSet.getLong("eventId"));
     }
 }

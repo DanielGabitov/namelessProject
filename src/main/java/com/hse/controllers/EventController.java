@@ -2,6 +2,7 @@ package com.hse.controllers;
 
 import com.hse.models.Event;
 import com.hse.models.EventRegistrationData;
+import com.hse.models.User;
 import com.hse.services.EventService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/events")
@@ -24,10 +27,6 @@ public class EventController {
 
     @PostMapping(consumes = {"application/json"})
     @ApiOperation(value = "", nickname = "Create new event.", tags = {"Events"})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Internal serverError")}
-    )
     public ResponseEntity<String> createEvent(@RequestBody EventRegistrationData eventRegistrationData) {
         eventService.createEvent(eventRegistrationData);
         return new ResponseEntity<>("Event has been added", HttpStatus.OK);
@@ -42,12 +41,14 @@ public class EventController {
 
     @GetMapping(value = "/{eventId}", produces = {"application/json"})
     @ApiOperation(value = "", nickname = "Get event.", tags = {"Events"})
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Internal serverError")}
-    )
     public ResponseEntity<Event> getEvent(@PathVariable("eventId") long eventId) {
         Event event = eventService.getEvent(eventId);
         return new ResponseEntity<>(event, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{eventId}/participants", produces = {"application/json"})
+    @ApiOperation(value = "", nickname = "Get event participants.", tags = {"Events"})
+    public ResponseEntity<List<User>> getEventParticipants(@PathVariable("eventId") long eventId) {
+        return new ResponseEntity<>(eventService.getParticipants(eventId), HttpStatus.OK);
     }
 }
