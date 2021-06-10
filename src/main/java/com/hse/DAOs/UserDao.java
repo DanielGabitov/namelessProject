@@ -210,4 +210,11 @@ public class UserDao {
                         "WHERE creatorid = :creatorId AND eventid = :eventId",
                 map);
     }
+
+    public List<Long> getAllUserIds(){
+        return namedJdbcTemplate.query("SELECT * FROM users",
+                new MapSqlParameterSource(),
+                (resultSet, i) -> resultSet.getLong("id")
+        );
+    }
 }

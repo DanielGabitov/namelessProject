@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +44,13 @@ public class EventDao {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("id", id);
         return namedJdbcTemplate.query("SELECT * FROM events WHERE id= :id", map, eventMapper).stream().findAny();
+    }
+
+    public List<Long> getAllEventIds(){
+        return namedJdbcTemplate.query(
+                "SELECT * from events",
+                new MapSqlParameterSource(),
+                (resultSet, i) -> resultSet.getLong("id"));
     }
 
 
@@ -132,6 +138,21 @@ public class EventDao {
                 map, eventMapper);
     }
 
+    public List<Event> getRecommendedEvents(int offset, int size, long userId) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("offset", offset);
+        map.addValue("size", size);
+        map.addValue("userId", userId);
+
+        return namedJdbcTemplate.query(
+            "SELECT * FROM recommendations JOIN events " +
+                "ON recommendations.userid = :userId AND recommendations.eventid = events.id " +
+                "WHERE events.id NOT IN (SELECT eventid FROM likes WHERE likes.userid = :userId) " +
+                "ORDER BY coefficient DESC OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY",
+                map, eventMapper);
+    }
+
+
     public List<Event> getEvents(int offset, int size, EnumSet<Specialization> specializations) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("offset", offset);
@@ -141,7 +162,24 @@ public class EventDao {
 
         return namedJdbcTemplate.query(
                 "SELECT * FROM events WHERE specialization IN (:specializations) " +
-                        "OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY;",
+                    "OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY;",
+                map, eventMapper);
+    }
+
+    public List<Event> getRecommendedEvents(int offset, int size, long userId, EnumSet<Specialization> specializations) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("offset", offset);
+        map.addValue("size", size);
+        map.addValue("userId", userId);
+        List<String> values = specializations.stream().map(Specialization::name).collect(Collectors.toList());;
+        map.addValue("specializations", values);
+
+        return namedJdbcTemplate.query(
+            "SELECT * FROM recommendations JOIN events " +
+                "ON recommendations.userid = :userId AND recommendations.eventid = events.id " +
+                "WHERE events.id NOT IN (SELECT eventid FROM likes WHERE likes.userid = :userId) " +
+                "AND specialization IN (:specializations)" +
+                "ORDER BY coefficient DESC OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY",
                 map, eventMapper);
     }
 

@@ -256,6 +256,10 @@ public class UserService implements UserDetailsService {
                 .collect(Collectors.toList());
     }
 
+    public List<User> getParticipants(long eventId){
+        return eventService.getParticipantsIds(eventId).stream().map(this::loadUserById).collect(Collectors.toList());
+    }
+
     private User readRegistrationData(UserRegistrationData data) {
         User user = new User();
         user.setUserRole(data.getUserRole());

@@ -6,10 +6,7 @@ import com.hse.models.User;
 import com.hse.services.FeedService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -30,6 +27,14 @@ public class FeedController {
     public List<Event> getEvents(@RequestParam("offset") int offset, @RequestParam("size") int size,
                                  @RequestParam("specializations") EnumSet<Specialization> specializations) {
         return feedService.getEvents(offset, size, specializations);
+    }
+
+    @GetMapping(value = "/{userId}/events/recommendations")
+    @ApiOperation(value = "/events", nickname = "Get events for feed", tags = {"Feed"})
+    public List<Event> getEventRecommendations(@RequestParam("offset") int offset,  @RequestParam("size") int size,
+                                               @PathVariable("userId") long userId,
+                                               @RequestParam("specializations") EnumSet<Specialization> specializations) {
+        return feedService.getEventRecommendations(userId, offset, size, specializations);
     }
 
     @GetMapping(value = "/creators")

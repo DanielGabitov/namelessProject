@@ -1,6 +1,9 @@
 package com.hse.services;
 
-import com.hse.DAOs.*;
+import com.hse.DAOs.EventDao;
+import com.hse.DAOs.EventToImagesDao;
+import com.hse.DAOs.EventToParticipantDao;
+import com.hse.DAOs.LikesDao;
 import com.hse.exceptions.ServiceException;
 import com.hse.models.Application;
 import com.hse.models.Event;
@@ -23,18 +26,14 @@ public class EventService {
     private final EventToImagesDao eventToImagesDao;
     private final LikesDao likesDao;
 
-    private final UserService userService;
-
     @Autowired
     public EventService(EventDao eventDao, EventToParticipantDao eventToParticipantDao,
-                        EventToImagesDao eventToImagesDao, LikesDao likesDao, UserService userService) {
+                        EventToImagesDao eventToImagesDao, LikesDao likesDao) {
 
         this.eventDao = eventDao;
         this.eventToParticipantDao = eventToParticipantDao;
         this.eventToImagesDao = eventToImagesDao;
         this.likesDao = likesDao;
-
-        this.userService = userService;
     }
 
     @Transactional
@@ -91,10 +90,6 @@ public class EventService {
 
     public List<Long> getParticipantsIds(long eventId) {
         return eventToParticipantDao.getParticipants(eventId);
-    }
-
-    public List<User> getParticipants(long eventId){
-        return getParticipantsIds(eventId).stream().map(userService::loadUserById).collect(Collectors.toList());
     }
 
     public void addImages(long eventId, List<String> imageUUIDs) {

@@ -64,7 +64,7 @@ public class CreatorController {
         return new ResponseEntity<>(userService.getFutureEventsCreatorApplications(creatorId), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{creatorId}/invitations/passedEvents")
+    @GetMapping(value = "/{creatorId}/applications/passedEvents")
     @ApiOperation(value = "", nickname = "", tags = {"User"})
     public ResponseEntity<List<Event>> getCreatorPassedEventsApplications(@PathVariable("creatorId") long creatorId) {
         return new ResponseEntity<>(userService.getPassedEventsCreatorApplications(creatorId), HttpStatus.OK);
