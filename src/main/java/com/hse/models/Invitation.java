@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class Invitation {
     private Long creatorId;
     private Long eventId;
-    private Long  organizerId;
+    private Long organizerId;
     private String message;
     private Boolean accepted;
 }

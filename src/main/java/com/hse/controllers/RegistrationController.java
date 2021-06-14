@@ -22,8 +22,8 @@ public class RegistrationController {
     }
 
     @PostMapping(value = "/registration", consumes = {"application/json"})
-    public ResponseEntity<String> registration(@RequestBody UserRegistrationData userRegistrationData) {
+    public ResponseEntity<Void> registration(@RequestBody UserRegistrationData userRegistrationData) {
         userService.createUser(userRegistrationData);
-        return new ResponseEntity<>("User added successfully.", HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

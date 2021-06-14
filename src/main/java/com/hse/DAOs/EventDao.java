@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -31,13 +32,10 @@ public class EventDao {
         this.applicationMapper = applicationMapper;
     }
 
-    public boolean checkEvent(long eventId) {
+    public Integer getNumberOfEventsById(long eventId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("id", eventId);
-
-        Integer count = namedJdbcTemplate.queryForObject(
-                "SELECT count(id) FROM events WHERE id = :id", map, Integer.class);
-        return count != null && count > 0;
+        return namedJdbcTemplate.queryForObject("SELECT count(id) FROM events WHERE id = :id", map, Integer.class);
     }
 
     public Optional<Event> getEvent(long id) {
@@ -46,7 +44,7 @@ public class EventDao {
         return namedJdbcTemplate.query("SELECT * FROM events WHERE id= :id", map, eventMapper).stream().findAny();
     }
 
-    public List<Long> getAllEventIds(){
+    public List<Long> getAllEventIds() {
         return namedJdbcTemplate.query(
                 "SELECT * from events",
                 new MapSqlParameterSource(),
@@ -57,13 +55,7 @@ public class EventDao {
     public long createEvent(Event event) {
         MapSqlParameterSource map = new MapSqlParameterSource();
 
-        map.addValue("name", event.getName());
-        map.addValue("description", event.getDescription());
-        map.addValue("organizerId", event.getOrganizerId());
-        map.addValue("rating", event.getRating());
-        map.addValue("geoData", event.getGeoData());
-        map.addValue("specialization", event.getSpecialization().name());
-        map.addValue("date", event.getDate());
+        mapEventParameters(event, map);
 
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -76,11 +68,7 @@ public class EventDao {
         return (long) keyHolder.getKeyList().get(0).get("id");
     }
 
-
-    public void updateEvent(long eventId, Event event) {
-        MapSqlParameterSource map = new MapSqlParameterSource();
-
-        map.addValue("id", eventId);
+    private void mapEventParameters(Event event, MapSqlParameterSource map) {
         map.addValue("name", event.getName());
         map.addValue("description", event.getDescription());
         map.addValue("organizerId", event.getOrganizerId());
@@ -88,6 +76,14 @@ public class EventDao {
         map.addValue("geoData", event.getGeoData());
         map.addValue("specialization", event.getSpecialization().name());
         map.addValue("date", event.getDate());
+    }
+
+
+    public void updateEvent(long eventId, Event event) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+
+        map.addValue("id", eventId);
+        mapEventParameters(event, map);
 
         namedJdbcTemplate.update(
                 "UPDATE events SET name = :name, description = :description, organizerid = :organizerId, " +
@@ -95,38 +91,42 @@ public class EventDao {
                         "WHERE id = :id", map);
     }
 
-    public List<Event> getAllFutureEvents(List<Long> eventIds){
+    public List<Event> getAllFutureEvents(List<Long> eventIds, Timestamp time) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("events", eventIds);
+        map.addValue("time", time);
 
-        return namedJdbcTemplate.query("SELECT * from events WHERE id IN (:events) AND date > now()",
+        return namedJdbcTemplate.query("SELECT * from events WHERE id IN (:events) AND date > :time",
                 map,
                 eventMapper);
     }
 
-    public List<Event> getAllPassedEvents(List<Long> eventIds){
+    public List<Event> getAllPassedEvents(List<Long> eventIds, Timestamp time) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("events", eventIds);
+        map.addValue("time", time);
 
-        return namedJdbcTemplate.query("SELECT * from events WHERE id IN (:events) AND date < now()",
+        return namedJdbcTemplate.query("SELECT * from events WHERE id IN (:events) AND date < :time",
                 map,
                 eventMapper);
     }
 
-    public List<Event> getAllPassedOrganizerEvents(long organizerId) {
+    public List<Event> getAllPassedOrganizerEvents(long organizerId, Timestamp time) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("organizerId", organizerId);
+        map.addValue("time", time);
 
         return namedJdbcTemplate.query(
-                "SELECT * FROM events WHERE organizerId = :organizerId AND date < now()", map, eventMapper);
+                "SELECT * FROM events WHERE organizerId = :organizerId AND date < :time", map, eventMapper);
     }
 
-    public List<Event> getAllFutureOrganizerEvents(long organizerId) {
+    public List<Event> getAllFutureOrganizerEvents(long organizerId, Timestamp time) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("organizerId", organizerId);
+        map.addValue("time", time);
 
         return namedJdbcTemplate.query(
-                "SELECT * FROM events WHERE organizerId = :organizerId AND date > now()", map, eventMapper);
+                "SELECT * FROM events WHERE organizerId = :organizerId AND date > :time", map, eventMapper);
     }
 
     public List<Event> getEvents(int offset, int size) {
@@ -145,25 +145,30 @@ public class EventDao {
         map.addValue("userId", userId);
 
         return namedJdbcTemplate.query(
-            "SELECT * FROM recommendations JOIN events " +
-                "ON recommendations.userid = :userId AND recommendations.eventid = events.id " +
-                "WHERE events.id NOT IN (SELECT eventid FROM likes WHERE likes.userid = :userId) " +
-                "ORDER BY coefficient DESC OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY",
+                "SELECT * FROM recommendations JOIN events " +
+                        "ON recommendations.userid = :userId AND recommendations.eventid = events.id " +
+                        "WHERE events.id NOT IN (SELECT eventid FROM likes WHERE likes.userid = :userId) " +
+                        "ORDER BY coefficient DESC OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY",
                 map, eventMapper);
     }
 
 
     public List<Event> getEvents(int offset, int size, EnumSet<Specialization> specializations) {
-        MapSqlParameterSource map = new MapSqlParameterSource();
-        map.addValue("offset", offset);
-        map.addValue("size", size);
-        List<String> values = specializations.stream().map(Specialization::name).collect(Collectors.toList());;
-        map.addValue("specializations", values);
+        MapSqlParameterSource map = mapOffsetAndSize(offset, size, specializations);
 
         return namedJdbcTemplate.query(
                 "SELECT * FROM events WHERE specialization IN (:specializations) " +
-                    "OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY;",
+                        "OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY;",
                 map, eventMapper);
+    }
+
+    static MapSqlParameterSource mapOffsetAndSize(int offset, int size, EnumSet<Specialization> specializations) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("offset", offset);
+        map.addValue("size", size);
+        List<String> values = specializations.stream().map(Specialization::name).collect(Collectors.toList());
+        map.addValue("specializations", values);
+        return map;
     }
 
     public List<Event> getRecommendedEvents(int offset, int size, long userId, EnumSet<Specialization> specializations) {
@@ -171,19 +176,19 @@ public class EventDao {
         map.addValue("offset", offset);
         map.addValue("size", size);
         map.addValue("userId", userId);
-        List<String> values = specializations.stream().map(Specialization::name).collect(Collectors.toList());;
+        List<String> values = specializations.stream().map(Specialization::name).collect(Collectors.toList());
         map.addValue("specializations", values);
 
         return namedJdbcTemplate.query(
-            "SELECT * FROM recommendations JOIN events " +
-                "ON recommendations.userid = :userId AND recommendations.eventid = events.id " +
-                "WHERE events.id NOT IN (SELECT eventid FROM likes WHERE likes.userid = :userId) " +
-                "AND specialization IN (:specializations)" +
-                "ORDER BY coefficient DESC OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY",
+                "SELECT * FROM recommendations JOIN events " +
+                        "ON recommendations.userid = :userId AND recommendations.eventid = events.id " +
+                        "WHERE events.id NOT IN (SELECT eventid FROM likes WHERE likes.userid = :userId) " +
+                        "AND specialization IN (:specializations)" +
+                        "ORDER BY coefficient DESC OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY",
                 map, eventMapper);
     }
 
-    public List<Long> getOrganizerEvents(long organizerId){
+    public List<Long> getOrganizerEvents(long organizerId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("organizerId", organizerId);
         return namedJdbcTemplate.query("SELECT * FROM events WHERE organizerid = :organizerId",
@@ -191,7 +196,7 @@ public class EventDao {
                 (resultSet, i) -> resultSet.getLong("id"));
     }
 
-    public List<Long> getCreatorApplicationEvents(long creatorId){
+    public List<Long> getCreatorApplicationEvents(long creatorId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("creatorId", creatorId);
 
@@ -200,24 +205,24 @@ public class EventDao {
                 (resultSet, i) -> resultSet.getLong("eventId"));
     }
 
-    public List<Application> getEventApplications(long eventId){
+    public List<Application> getEventApplications(long eventId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("eventId", eventId);
         return namedJdbcTemplate.query(
                 "SELECT * from creators_invites WHERE eventid = :eventId",
                 map, applicationMapper);
     }
-  
-    public void addParticipant(long eventId, long participantId){
+
+    public void addParticipant(long eventId, long participantId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("eventId", eventId);
         map.addValue("participantId", participantId);
         namedJdbcTemplate.update(
                 "INSERT INTO events_participants (eventid, participantId) " +
-                    "VALUES (:eventId, :participantId)", map);
+                        "VALUES (:eventId, :participantId)", map);
     }
 
-    public void deleteParticipant(long eventId, long participantId){
+    public void deleteParticipant(long eventId, long participantId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("eventId", eventId);
         map.addValue("participantId", participantId);
@@ -225,13 +230,12 @@ public class EventDao {
                 "DELETE FROM events_participants WHERE eventid = :eventId AND participantid = :participantId", map);
     }
 
-    public boolean checkParticipant(long eventId, long participantId){
+    public Integer getNumberOfParticipantsOfEventByParticipantId(long eventId, long participantId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("eventId", eventId);
         map.addValue("participantId", participantId);
-        Integer count = namedJdbcTemplate.queryForObject(
+        return namedJdbcTemplate.queryForObject(
                 "SELECT count(participantid) FROM events_participants " +
-                    "WHERE eventid = :eventId AND participantid = :participantId", map, Integer.class);
-        return count != null && count > 0;
+                        "WHERE eventid = :eventId AND participantid = :participantId", map, Integer.class);
     }
 }

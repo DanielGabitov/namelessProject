@@ -12,36 +12,36 @@ public class RecommendationDao {
         this.namedJdbcTemplate = namedJdbcTemplate;
     }
 
-    public void clearRecommendations(){
+    public void clearRecommendations() {
         MapSqlParameterSource map = new MapSqlParameterSource();
         namedJdbcTemplate.update("TRUNCATE recommendations", map);
         namedJdbcTemplate.update("TRUNCATE users_with_recommendations", map);
     }
 
-    public void addEventRecommendation(Long userId, Long eventId, float coefficient){
+    public void addEventRecommendation(Long userId, Long eventId, float coefficient) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);
         map.addValue("eventId", eventId);
         map.addValue("coefficient", coefficient);
         namedJdbcTemplate.update(
-        "INSERT INTO recommendations (userid, eventid, coefficient) VALUES (:userId, :eventId, :coefficient)",
-            map
+                "INSERT INTO recommendations (userid, eventid, coefficient) VALUES (:userId, :eventId, :coefficient)",
+                map
         );
     }
 
-    public void markThatUserHasRecommendations(long userId){
+    public void markThatUserHasRecommendations(long userId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);
         namedJdbcTemplate.update("INSERT INTO users_with_recommendations (userid) VALUES (:userId)", map);
     }
 
-    public boolean checkIfUserHasRecommendations(long userId){
+    public Integer getNumberOfUserRecommendationsByUserId(long userId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);
-        return namedJdbcTemplate.query(
-            "SELECT * FROM users_with_recommendations",
+        return namedJdbcTemplate.queryForObject(
+                "SELECT count(userid) FROM users_with_recommendations",
                 map,
-                (resultSet, i) -> resultSet.getLong("userId")
-        ).stream().findAny().isPresent();
+                Integer.class
+        );
     }
 }

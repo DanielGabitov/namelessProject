@@ -31,7 +31,7 @@ public class FeedController {
 
     @GetMapping(value = "/{userId}/events/recommendations")
     @ApiOperation(value = "/events", nickname = "Get events for feed", tags = {"Feed"})
-    public List<Event> getEventRecommendations(@RequestParam("offset") int offset,  @RequestParam("size") int size,
+    public List<Event> getEventRecommendations(@RequestParam("offset") int offset, @RequestParam("size") int size,
                                                @PathVariable("userId") long userId,
                                                @RequestParam("specializations") EnumSet<Specialization> specializations) {
         return feedService.getEventRecommendations(userId, offset, size, specializations);

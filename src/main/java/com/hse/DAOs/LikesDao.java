@@ -24,15 +24,14 @@ public class LikesDao {
         namedJdbcTemplate.update("INSERT INTO likes (userId, eventid) VALUES (:userId, :eventId)", map);
     }
 
-    public boolean checkLike(long userId, long eventId) {
+    public Integer getNumberOfLikesAtEventByUserId(long userId, long eventId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);
         map.addValue("eventId", eventId);
 
-        Integer count = namedJdbcTemplate.queryForObject(
+        return namedJdbcTemplate.queryForObject(
                 "SELECT count(eventid) FROM likes WHERE eventid = :eventId AND userId = :userId",
                 map, Integer.class);
-        return count != null && count > 0;
     }
 
     public void removeLike(long userId, long eventId) {

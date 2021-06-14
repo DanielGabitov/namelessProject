@@ -14,13 +14,13 @@ public class NotificationDao {
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final NotificationMapper notificationMapper;
 
-    public NotificationDao(NamedParameterJdbcTemplate namedJdbcTemplate, NotificationMapper notificationMapper){
+    public NotificationDao(NamedParameterJdbcTemplate namedJdbcTemplate, NotificationMapper notificationMapper) {
         this.namedJdbcTemplate = namedJdbcTemplate;
         this.notificationMapper = notificationMapper;
     }
 
     public void addNotification(long notificationReceiverId, long notificationProducerId,
-                                NotificationType notificationType){
+                                NotificationType notificationType) {
 
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("notificationReceiverId", notificationReceiverId);
@@ -29,18 +29,18 @@ public class NotificationDao {
 
         namedJdbcTemplate.update(
                 "INSERT INTO notifications (notificationReceiverId, notificationProducerId, notificationType)" +
-                    " VALUES (:notificationReceiverId, :notificationProducerId, :notificationType)", map);
+                        " VALUES (:notificationReceiverId, :notificationProducerId, :notificationType)", map);
     }
 
-    public List<Notification> getUserNotifications(long userId){
+    public List<Notification> getUserNotifications(long userId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("notificationReceiverId", userId);
         return namedJdbcTemplate.query(
                 "SELECT * FROM notifications WHERE notificationReceiverId = :notificationReceiverId",
-                    map, notificationMapper);
+                map, notificationMapper);
     }
 
-    public void deleteNotifications(List<Long> notificationIds){
+    public void deleteNotifications(List<Long> notificationIds) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("notificationIds", notificationIds);
         namedJdbcTemplate.update("DELETE FROM notifications WHERE notificationid IN (:notificationIds)", map);

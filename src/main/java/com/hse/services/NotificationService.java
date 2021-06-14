@@ -16,13 +16,13 @@ public class NotificationService {
         this.notificationDao = notificationDao;
     }
 
-    public void sendNewInvitationNotification(long creatorId, long  organizerId) {
+    public void sendNewInvitationNotification(long creatorId, long organizerId) {
         notificationDao.addNotification(creatorId, organizerId, NotificationType.NEW_INVITATION);
     }
 
     public void sendInvitationAnswerNotification(long creatorId, long organizerId, boolean accepted) {
         NotificationType notificationType;
-        if (accepted){
+        if (accepted) {
             notificationType = NotificationType.INVITATION_ANSWER_ACCEPTED;
         } else {
             notificationType = NotificationType.INVITATION_ANSWER_REJECTED;
@@ -36,7 +36,7 @@ public class NotificationService {
 
     public void sendApplicationAnswerNotification(long creatorId, long eventId, boolean accepted) {
         NotificationType notificationType;
-        if (accepted){
+        if (accepted) {
             notificationType = NotificationType.APPLICATION_ANSWER_ACCEPTED;
         } else {
             notificationType = NotificationType.APPLICATION_ANSWER_REJECTED;
@@ -44,11 +44,11 @@ public class NotificationService {
         notificationDao.addNotification(creatorId, eventId, notificationType);
     }
 
-    public List<Notification> getUserNotifications(long userId){
+    public List<Notification> getUserNotifications(long userId) {
         return notificationDao.getUserNotifications(userId);
     }
 
-    public void deleteNotifications(List<Long> notificationsId){
+    public void deleteNotifications(List<Long> notificationsId) {
         notificationDao.deleteNotifications(notificationsId);
     }
 }
