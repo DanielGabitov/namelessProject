@@ -139,4 +139,10 @@ public class EventService {
 
         return event;
     }
+
+    public List<Event> searchEvents(String eventName, int offset, int size) {
+        return eventDao.searchEvents(eventName, offset, size).stream()
+                .map(this::setEventDataFromOtherTables)
+                .collect(Collectors.toList());
+    }
 }

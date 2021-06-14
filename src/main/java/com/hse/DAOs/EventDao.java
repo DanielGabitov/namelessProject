@@ -238,4 +238,13 @@ public class EventDao {
                 "SELECT count(participantid) FROM events_participants " +
                         "WHERE eventid = :eventId AND participantid = :participantId", map, Integer.class);
     }
+
+    public List<Event> searchEvents(String eventName, int offset, int size) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("eventName", eventName);
+        map.addValue("offset", offset);
+        map.addValue("size", size);
+        return namedJdbcTemplate.query("SELECT *, similarity(name, :eventName) AS sml FROM events " +
+                "ORDER BY sml DESC OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY", map, eventMapper);
+    }
 }

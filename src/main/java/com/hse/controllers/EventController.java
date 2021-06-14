@@ -52,4 +52,12 @@ public class EventController {
     public ResponseEntity<List<User>> getEventParticipants(@PathVariable("eventId") long eventId) {
         return new ResponseEntity<>(userService.getParticipants(eventId), HttpStatus.OK);
     }
+
+    @GetMapping(value = "/search", produces = {"application/json"})
+    @ApiOperation(value = "", nickname = "Search events.", tags = {"Events"})
+    public ResponseEntity<List<Event>> searchEvents(@RequestParam("eventName") String eventName,
+                                                    @RequestParam("offset") int offset,
+                                                    @RequestParam("size") int size) {
+        return new ResponseEntity<>(eventService.searchEvents(eventName, offset, size), HttpStatus.OK);
+    }
 }

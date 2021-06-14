@@ -218,4 +218,13 @@ public class UserDao {
                 (resultSet, i) -> resultSet.getLong("id")
         );
     }
+
+    public List<User> searchUsers(String username, int offset, int size) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("username", username);
+        map.addValue("offset", offset);
+        map.addValue("size", size);
+        return namedJdbcTemplate.query("SELECT * FROM users ORDER BY word_similarity(username, :username) DESC" +
+                " OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY", map, userMapper);
+    }
 }

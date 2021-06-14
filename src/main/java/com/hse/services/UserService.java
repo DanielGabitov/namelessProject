@@ -283,4 +283,10 @@ public class UserService implements UserDetailsService {
 
         return user;
     }
+
+    public List<User> searchUsers(String username, int offset, int size) {
+        return userDao.searchUsers(username, offset, size).stream()
+                .map(this::setUserDataFromOtherTables)
+                .collect(Collectors.toList());
+    }
 }

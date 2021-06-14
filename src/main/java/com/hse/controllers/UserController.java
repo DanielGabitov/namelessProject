@@ -127,4 +127,12 @@ public class UserController {
                                                               @PathVariable("eventId") long eventId) {
         return new ResponseEntity<>(userService.checkIfParticipationExists(userId, eventId), HttpStatus.OK);
     }
+
+    @GetMapping(value = "/search", produces = {"application/json"})
+    @ApiOperation(value = "", nickname = "Search users.", tags = {"User"})
+    public ResponseEntity<List<User>> searchUsers(@RequestParam("username") String username,
+                                                  @RequestParam("offset") int offset,
+                                                  @RequestParam("size") int size) {
+        return new ResponseEntity<>(userService.searchUsers(username, offset, size), HttpStatus.OK);
+    }
 }
