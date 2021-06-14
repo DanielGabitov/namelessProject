@@ -18,10 +18,10 @@ services:
     ports:
       - 5433:5432
 
-#  appimage:
-#    build: .
-#    ports:
-#      - 8080:8080
+  appimage:
+    build: .
+    ports:
+      - 8080:8080
 
   flyway:
     image: flyway/flyway:latest

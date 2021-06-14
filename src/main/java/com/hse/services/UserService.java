@@ -260,6 +260,14 @@ public class UserService implements UserDetailsService {
         return eventService.getParticipantsIds(eventId).stream().map(this::loadUserById).collect(Collectors.toList());
     }
 
+    public boolean checkIfCreatorHasInvitationToEvent(long creatorId, long eventId){
+        return userDao.getCreatorInvitationFromEvent(creatorId, eventId).isPresent();
+    }
+
+    public boolean checkIfCreatorHasApplicationFromEvent(long eventId, long creatorId){
+        return userDao.getEventApplicationToCreator(eventId, creatorId).isPresent();
+    }
+
     private User readRegistrationData(UserRegistrationData data) {
         User user = new User();
         user.setUserRole(data.getUserRole());

@@ -138,6 +138,17 @@ public class UserDao {
         ).stream().findAny();
     }
 
+    public Optional<Application> getEventApplicationToCreator(long eventId, long creatorId){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("creatorId", creatorId);
+        map.addValue("eventId", eventId);
+
+        return namedJdbcTemplate.query(
+                "SELECT * from event_applications WHERE eventId = :eventId AND creatorId = :creatorId",
+                map,
+                applicationMapper).stream().findAny();
+    }
+
     public List<Invitation> getCreatorInvitations(long creatorId){
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("creatorId", creatorId);
