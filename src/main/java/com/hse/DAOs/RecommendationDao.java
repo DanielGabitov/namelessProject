@@ -18,7 +18,7 @@ public class RecommendationDao {
         namedJdbcTemplate.update("TRUNCATE users_with_recommendations", map);
     }
 
-    public void addEventRecommendation(Long userId, Long eventId, float coefficient) {
+    public void addEventRecommendation(Long userId, Long eventId, double coefficient) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);
         map.addValue("eventId", eventId);

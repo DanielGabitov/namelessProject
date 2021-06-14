@@ -47,3 +47,11 @@ CREATE TABLE event_applications
     message   text,
     accepted  bool
 );
+
+
+CREATE TABLE user_viewed_events
+(
+    userId bigint NOT NULL,
+    eventId bigint NOT NULL,
+    PRIMARY KEY (userId, eventId)
+)
