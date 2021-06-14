@@ -25,25 +25,28 @@ public class SubscriptionService {
     public void addSubscription(long userId, long subscriptionId) {
         if (userId == subscriptionId) {
             throw new ServiceException(HttpStatus.BAD_REQUEST, "User cannot subscribe to himself.");
-        } else if (checkSubscription(userId, subscriptionId)) {
-            throw new ServiceException(HttpStatus.BAD_REQUEST, "Subscription already exist.");
         }
-        User userToSubscribe = userService.loadUserById(subscriptionId);
-        if (userToSubscribe.getUserRole().equals(UserRole.USER)) {
-            throw new ServiceException(HttpStatus.BAD_REQUEST, "There is no way to subscribe to the user.");
+        if (!checkIfSubscriptionExists(userId, subscriptionId)) {
+            User userToSubscribe = userService.loadUserById(subscriptionId);
+            if (userToSubscribe.getUserRole().equals(UserRole.USER)) {
+                throw new ServiceException(HttpStatus.BAD_REQUEST, "There is no way to subscribe to the user.");
+            }
+            if (!userService.checkIfUserExists(subscriptionId)) {
+                throw new ServiceException(HttpStatus.BAD_REQUEST, "There is no user with such id.");
+            }
+            subscriptionDao.addSubscription(userId, subscriptionId);
         }
-        subscriptionDao.addSubscription(userId, subscriptionId);
     }
 
-    public boolean checkSubscription(long userId, long subscriptionId) {
-        return subscriptionDao.checkSubscription(userId, subscriptionId);
+    public boolean checkIfSubscriptionExists(long userId, long subscriptionId) {
+        Integer numberOfUserSubscriptionsById = subscriptionDao.getNumberOfUserSubscriptionsWithSuchId(userId, subscriptionId);
+        return numberOfUserSubscriptionsById != null && numberOfUserSubscriptionsById != 0;
     }
 
     public void deleteSubscription(long userId, long subscriptionId) {
-        if (!checkSubscription(userId, subscriptionId)) {
-            throw new ServiceException(HttpStatus.BAD_REQUEST, "Subscription dost not exist.");
+        if (checkIfSubscriptionExists(userId, subscriptionId)) {
+            subscriptionDao.deleteSubscription(userId, subscriptionId);
         }
-        subscriptionDao.deleteSubscription(userId, subscriptionId);
     }
 
     public List<User> getAllSubscriptions(long userId) {

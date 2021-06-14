@@ -8,7 +8,6 @@ import com.hse.exceptions.ServiceException;
 import com.hse.models.Application;
 import com.hse.models.Event;
 import com.hse.models.EventRegistrationData;
-import com.hse.models.User;
 import com.hse.systems.FileSystemInteractor;
 import com.hse.utils.Coder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +38,7 @@ public class EventService {
 
     @Transactional
     public void createEvent(EventRegistrationData eventRegistrationData) {
-        Event event = readRegistrationData(eventRegistrationData);
+        Event event = mapRegistrationData(eventRegistrationData);
         long eventId = eventDao.createEvent(event);
         addParticipants(eventId, event.getParticipantsIDs());
         List<String> imageUUIDs = ImageService.saveImagesToFileSystem(eventRegistrationData.getImages());
@@ -47,7 +47,8 @@ public class EventService {
 
     @Transactional
     public void updateEvent(long eventId, Event event) {
-        if (!eventDao.checkEvent(eventId)) {
+        Integer numberOfEventsById = eventDao.getNumberOfEventsById(eventId);
+        if (numberOfEventsById == null || numberOfEventsById == 0) {
             throw new ServiceException(HttpStatus.BAD_REQUEST, "There is no event with such id.");
         }
         eventDao.updateEvent(eventId, event);
@@ -63,25 +64,25 @@ public class EventService {
     @Transactional
     public Event getEvent(long eventId) {
         Event event = getEventFromEventTable(eventId);
-        setEventDataFromOtherTables(event);
-        return event;
+        return setEventDataFromOtherTables(event);
     }
 
-    private Event getEventFromEventTable(long eventId){
+    private Event getEventFromEventTable(long eventId) {
         return eventDao.getEvent(eventId).orElseThrow(
                 () -> new ServiceException(HttpStatus.BAD_REQUEST, "Failed to find event with given ID.")
         );
     }
 
-    public Long getEventOrganizer(long eventId){
+    public Long getEventOrganizer(long eventId) {
         return getEventFromEventTable(eventId).getOrganizerId();
     }
 
-    public void setEventDataFromOtherTables(Event event) {
+    public Event setEventDataFromOtherTables(Event event) {
         Long id = event.getId();
         event.setParticipantsIDs(getParticipantsIds(id));
         event.setImages(getImages(id));
         event.setLikes(getLikes(id));
+        return event;
     }
 
     public void addParticipants(long eventId, List<Long> participants) {
@@ -107,23 +108,23 @@ public class EventService {
         return likesDao.getEventLikes(eventId);
     }
 
-    public List<Application> getEventApplications(long eventId){
+    public List<Application> getEventApplications(long eventId) {
         return eventDao.getEventApplications(eventId);
     }
 
-    public List<Event> getFutureEvents(List<Long> eventIds){
-        return eventDao.getAllFutureEvents(eventIds).stream()
-                .peek(this::setEventDataFromOtherTables)
+    public List<Event> getFutureEvents(List<Long> eventIds, Timestamp time) {
+        return eventDao.getAllFutureEvents(eventIds, time).stream()
+                .map(this::setEventDataFromOtherTables)
                 .collect(Collectors.toList());
     }
 
-    public List<Event> getPassedEvents(List<Long> eventIds){
-        return eventDao.getAllPassedEvents(eventIds).stream()
-                .peek(this::setEventDataFromOtherTables)
+    public List<Event> getPassedEvents(List<Long> eventIds, Timestamp time) {
+        return eventDao.getAllPassedEvents(eventIds, time).stream()
+                .map(this::setEventDataFromOtherTables)
                 .collect(Collectors.toList());
     }
 
-    private Event readRegistrationData(EventRegistrationData data) {
+    private Event mapRegistrationData(EventRegistrationData data) {
         Event event = new Event();
         event.setName(data.getName());
         event.setDescription(data.getDescription());

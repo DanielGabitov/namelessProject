@@ -1,9 +1,12 @@
 package com.hse.security;
 
+import com.hse.exceptions.ServiceException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
@@ -15,8 +18,8 @@ public class JwtProvider {
     private final Key key;
 
     @Autowired
-    public JwtProvider() {
-        this.key = Keys.hmacShaKeyFor("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c".getBytes());
+    public JwtProvider(@Value("${jwt.key}") String key) {
+        this.key = Keys.hmacShaKeyFor(key.getBytes());
     }
 
     public String generateToken(@NotNull String username) {
@@ -27,9 +30,6 @@ public class JwtProvider {
     }
 
     public boolean validateToken(String token) {
-        if (token == null) {
-            return false;
-        }
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key)
@@ -38,7 +38,7 @@ public class JwtProvider {
                     .getBody();
             return true;
         } catch (JwtException exception) {
-            return false;
+            throw new ServiceException(HttpStatus.BAD_REQUEST, "Invalid token.");
         }
     }
 

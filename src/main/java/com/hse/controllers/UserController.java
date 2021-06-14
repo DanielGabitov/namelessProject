@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 
@@ -29,15 +30,15 @@ public class UserController {
 
     @PutMapping(value = "/{userId}", consumes = {"application/json"})
     @ApiOperation(value = "", nickname = "Update user.", tags = {"User"})
-    public ResponseEntity<String> updateUser(@PathVariable("userId") long userId,
-                                             @RequestBody User user) {
+    public ResponseEntity<Void> updateUser(@PathVariable("userId") long userId,
+                                           @RequestBody User user) {
         userService.updateUser(userId, user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}", produces = {"application/json"})
     @ApiOperation(value = "", nickname = "Get new user.", tags = {"User"})
-    public ResponseEntity<User> getUser(@PathVariable("id") Long userId) {
+    public ResponseEntity<User> getUser(@PathVariable("id") long userId) {
         return new ResponseEntity<>(userService.loadUserById(userId), HttpStatus.OK);
     }
 
@@ -49,25 +50,25 @@ public class UserController {
 
     @PostMapping(value = "/{userId}/likes/{eventId}")
     @ApiOperation(value = "", nickname = "Add like.", tags = {"User"})
-    public ResponseEntity<String> addLike(@PathVariable("userId") long userId,
-                                          @PathVariable("eventId") long eventId) {
+    public ResponseEntity<Void> addLike(@PathVariable("userId") long userId,
+                                        @PathVariable("eventId") long eventId) {
         userService.addLike(userId, eventId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{userId}/likes/{eventId}")
     @ApiOperation(value = "", nickname = "Remove like.", tags = {"User"})
-    public ResponseEntity<String> removeLike(@PathVariable("userId") long userId,
-                                             @PathVariable("eventId") long eventId) {
+    public ResponseEntity<Void> removeLike(@PathVariable("userId") long userId,
+                                           @PathVariable("eventId") long eventId) {
         userService.removeLike(userId, eventId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping(value = "/{userId}/likes/{eventId}")
     @ApiOperation(value = "", nickname = "Check if user liked event.", tags = {"User"})
-    public ResponseEntity<Boolean> checkLike(@PathVariable("userId") long userId,
-                                             @PathVariable("eventId") long eventId) {
-        return new ResponseEntity<>(userService.checkLike(userId, eventId), HttpStatus.OK);
+    public ResponseEntity<Boolean> checkIfLikeExists(@PathVariable("userId") long userId,
+                                                     @PathVariable("eventId") long eventId) {
+        return new ResponseEntity<>(userService.checkIfLikeExists(userId, eventId), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{userId}/notifications")
@@ -79,23 +80,23 @@ public class UserController {
     @DeleteMapping(value = "/{userId}/notifications", consumes = {"application/json"})
     @ApiOperation(value = "", nickname = "Принимает JSON с массивом ID'шников уведомлений, которые нужно удалить",
             tags = {"User"})
-    public ResponseEntity<String> deleteNotifications(@PathVariable("userId") long userId, @RequestBody List<Long> notificationIds) {
+    public ResponseEntity<Void> deleteNotifications(@PathVariable("userId") long userId, @RequestBody List<Long> notificationIds) {
         notificationService.deleteNotifications(notificationIds);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping(value = "/{userId}/events/{eventId}/participants")
     @ApiOperation(value = "", nickname = "", tags = {"User"})
-    public ResponseEntity<String> participate(@PathVariable("userId") long userId,
-                                              @PathVariable("eventId") long eventId){
+    public ResponseEntity<Void> participate(@PathVariable("userId") long userId,
+                                            @PathVariable("eventId") long eventId) {
         userService.participate(userId, eventId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{userId}/events/{eventId}/participants")
     @ApiOperation(value = "", nickname = "", tags = {"User"})
-    public ResponseEntity<String> cancelParticipation(@PathVariable("userId") long userId,
-                                                      @PathVariable("eventId") long eventId){
+    public ResponseEntity<Void> cancelParticipation(@PathVariable("userId") long userId,
+                                                    @PathVariable("eventId") long eventId) {
         userService.cancelParticipation(userId, eventId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -106,22 +107,24 @@ public class UserController {
         return new ResponseEntity<>(userService.getUserParticipations(userId), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{userId}/participations/future", produces = {"application/json"})
+    @GetMapping(value = "/{userId}/participations/future/{time}", produces = {"application/json"})
     @ApiOperation(value = "", nickname = "Get future events in which user participate.", tags = {"User"})
-    public ResponseEntity<List<Event>> getFutureUserParticipations(@PathVariable("userId") long userId) {
-        return new ResponseEntity<>(userService.getAllFutureParticipations(userId), HttpStatus.OK);
+    public ResponseEntity<List<Event>> getFutureUserParticipations(@PathVariable("userId") long userId,
+                                                                   @PathVariable("time") Timestamp time) {
+        return new ResponseEntity<>(userService.getAllFutureParticipations(userId, time), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{userId}/participations/passed", produces = {"application/json"})
+    @GetMapping(value = "/{userId}/participations/passed/{time}", produces = {"application/json"})
     @ApiOperation(value = "", nickname = "Get passed events in which user participate.", tags = {"User"})
-    public ResponseEntity<List<Event>> getPassedUserParticipations(@PathVariable("userId") long userId) {
-        return new ResponseEntity<>(userService.getAllPassedParticipations(userId), HttpStatus.OK);
+    public ResponseEntity<List<Event>> getPassedUserParticipations(@PathVariable("userId") long userId,
+                                                                   @PathVariable("time") Timestamp time) {
+        return new ResponseEntity<>(userService.getAllPassedParticipations(userId, time), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{userId}/participations/{eventId}", produces = {"application/json"})
     @ApiOperation(value = "", nickname = "Check if user participate in event with eventId.", tags = {"User"})
-    public ResponseEntity<Boolean> checkParticipation(@PathVariable("userId") long userId,
-                                                          @PathVariable("eventId") long eventId) {
-        return new ResponseEntity<>(userService.checkParticipation(userId, eventId), HttpStatus.OK);
+    public ResponseEntity<Boolean> checkIfParticipationExists(@PathVariable("userId") long userId,
+                                                              @PathVariable("eventId") long eventId) {
+        return new ResponseEntity<>(userService.checkIfParticipationExists(userId, eventId), HttpStatus.OK);
     }
 }

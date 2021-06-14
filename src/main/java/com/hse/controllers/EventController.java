@@ -28,16 +28,16 @@ public class EventController {
 
     @PostMapping(consumes = {"application/json"})
     @ApiOperation(value = "", nickname = "Create new event.", tags = {"Events"})
-    public ResponseEntity<String> createEvent(@RequestBody EventRegistrationData eventRegistrationData) {
+    public ResponseEntity<Void> createEvent(@RequestBody EventRegistrationData eventRegistrationData) {
         eventService.createEvent(eventRegistrationData);
-        return new ResponseEntity<>("Event has been added", HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping(value = "/{eventId}", consumes = {"application/json"})
     @ApiOperation(value = "", nickname = "Update event.", tags = {"Events"})
-    public ResponseEntity<String> updateEvent(@PathVariable("eventId") long eventId, @RequestBody Event event) {
+    public ResponseEntity<Void> updateEvent(@PathVariable("eventId") long eventId, @RequestBody Event event) {
         eventService.updateEvent(eventId, event);
-        return new ResponseEntity<>("Event has been updated", HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping(value = "/{eventId}", produces = {"application/json"})

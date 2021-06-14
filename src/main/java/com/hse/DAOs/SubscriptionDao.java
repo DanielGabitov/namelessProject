@@ -24,14 +24,13 @@ public class SubscriptionDao {
                 "INSERT INTO users_subscriptions (userid, subscriptionid) VALUES (:userId, :subscriptionId)", map);
     }
 
-    public boolean checkSubscription(long userId, long subscriptionId) {
+    public Integer getNumberOfUserSubscriptionsWithSuchId(long userId, long subscriptionId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userId", userId);
         map.addValue("subscriptionId", subscriptionId);
-        Integer count = namedJdbcTemplate.queryForObject(
+        return namedJdbcTemplate.queryForObject(
                 "SELECT count(userId) FROM users_subscriptions " +
                         "WHERE userId = :userId AND subscriptionId = :subscriptionId", map, Integer.class);
-        return count != null && count > 0;
     }
 
     public void deleteSubscription(long userId, long subscriptionId) {

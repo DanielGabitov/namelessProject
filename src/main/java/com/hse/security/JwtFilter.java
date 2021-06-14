@@ -1,8 +1,10 @@
 package com.hse.security;
 
+import com.hse.exceptions.ServiceException;
 import com.hse.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,6 +33,9 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse httpServletResponse,
                                     FilterChain filterChain) {
         String token = getTokenFromRequest(httpServletRequest);
+        if (token == null) {
+            throw new ServiceException(HttpStatus.BAD_REQUEST, "No authorization token.");
+        }
         if (jwtProvider.validateToken(token)) {
             String username = jwtProvider.getUsernameFromToken(token);
             UserDetails user = userService.loadUserByUsername(username);

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -41,13 +40,14 @@ public class FeedService {
             events = eventDao.getEvents(offset, size, specializations);
         }
         return events.stream()
-                .peek(eventService::setEventDataFromOtherTables)
+                .map(eventService::setEventDataFromOtherTables)
                 .collect(Collectors.toList());
     }
 
     public List<Event> getEventRecommendations(long userId, int offset,
                                                int size, EnumSet<Specialization> specializations) {
-        if (!recommendationDao.checkIfUserHasRecommendations(userId)){
+        Integer numberOfUserRecommendations = recommendationDao.getNumberOfUserRecommendationsByUserId(userId);
+        if (numberOfUserRecommendations == null || numberOfUserRecommendations == 0) {
             return getEvents(offset, size, specializations);
         }
         List<Event> events;
@@ -57,7 +57,7 @@ public class FeedService {
             events = eventDao.getRecommendedEvents(offset, size, userId, specializations);
         }
         return events.stream()
-                .peek(eventService::setEventDataFromOtherTables)
+                .map(eventService::setEventDataFromOtherTables)
                 .collect(Collectors.toList());
     }
 
@@ -69,7 +69,7 @@ public class FeedService {
             creators = userDao.getCreators(offset, size, specializations);
         }
         return creators.stream()
-                .peek(user -> user.setImages(userService.getImages(user.getId())))
+                .map(userService::setUserDataFromOtherTables)
                 .collect(Collectors.toList());
     }
 }

@@ -21,15 +21,15 @@ public class SubscriptionController {
     }
 
     @PostMapping
-    public ResponseEntity<String> addSubscription(@RequestParam("userId") long userId,
-                                                  @RequestParam("subscriptionId") long subscriptionId) {
+    public ResponseEntity<Void> addSubscription(@RequestParam("userId") long userId,
+                                                @RequestParam("subscriptionId") long subscriptionId) {
         subscriptionService.addSubscription(userId, subscriptionId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping
-    public ResponseEntity<String> deleteSubscription(@RequestParam("userId") long userId,
-                                                     @RequestParam("subscriptionId") long subscriptionId) {
+    public ResponseEntity<Void> deleteSubscription(@RequestParam("userId") long userId,
+                                                   @RequestParam("subscriptionId") long subscriptionId) {
         subscriptionService.deleteSubscription(userId, subscriptionId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

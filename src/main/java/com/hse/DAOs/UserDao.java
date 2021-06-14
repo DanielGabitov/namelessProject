@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class UserDao {
@@ -35,13 +34,12 @@ public class UserDao {
         this.inviteMapper = inviteMapper;
     }
 
-    public boolean checkUser(long userId) {
+    public Integer getNumberOfUsersById(long userId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("id", userId);
 
-        Integer count = namedJdbcTemplate.queryForObject(
+        return namedJdbcTemplate.queryForObject(
                 "SELECT count(id) FROM users WHERE id = :id", map, Integer.class);
-        return count != null && count > 0;
     }
 
     public Optional<User> getUserById(Long userId) throws IllegalArgumentException {
@@ -64,16 +62,7 @@ public class UserDao {
     }
 
     public long saveUser(User user) {
-        MapSqlParameterSource map = new MapSqlParameterSource();
-        map.addValue("userRole", user.getUserRole().name());
-        map.addValue("firstName", user.getFirstName());
-        map.addValue("lastName", user.getLastName());
-        map.addValue("patronymic", user.getPatronymic());
-        map.addValue("userName", user.getUsername());
-        map.addValue("password", user.getPassword());
-        map.addValue("specialization", user.getSpecialization().name());
-        map.addValue("rating", user.getRating());
-        map.addValue("description", user.getDescription());
+        MapSqlParameterSource map = mapUserParameters(user);
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
 
         namedJdbcTemplate.update(
@@ -86,6 +75,16 @@ public class UserDao {
     }
 
     public void updateUser(User newUser) {
+        MapSqlParameterSource map = mapUserParameters(newUser);
+
+        namedJdbcTemplate.update(
+                "UPDATE users SET userrole = :userRole, firstname = :firstName, lastname = :lastName, " +
+                        "patronymic = :patronymic, username = :userName, password = :password, " +
+                        "specialization = :specialization, rating = :rating, description = :description " +
+                        "WHERE username = :userName", map);
+    }
+
+    private MapSqlParameterSource mapUserParameters(User newUser) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("userRole", newUser.getUserRole().name());
         map.addValue("firstName", newUser.getFirstName());
@@ -96,12 +95,7 @@ public class UserDao {
         map.addValue("specialization", newUser.getSpecialization().name());
         map.addValue("rating", newUser.getRating());
         map.addValue("description", newUser.getDescription());
-
-        namedJdbcTemplate.update(
-                "UPDATE users SET userrole = :userRole, firstname = :firstName, lastname = :lastName, " +
-                        "patronymic = :patronymic, username = :userName, password = :password, " +
-                        "specialization = :specialization, rating = :rating, description = :description " +
-                        "WHERE username = :userName", map);
+        return map;
     }
 
     public List<User> getCreators(int offset, int size) {
@@ -115,11 +109,7 @@ public class UserDao {
     }
 
     public List<User> getCreators(int offset, int size, EnumSet<Specialization> specializations) {
-        MapSqlParameterSource map = new MapSqlParameterSource();
-        map.addValue("offset", offset);
-        map.addValue("size", size);
-        List<String> values = specializations.stream().map(Specialization::name).collect(Collectors.toList());
-        map.addValue("specializations", values);
+        MapSqlParameterSource map = EventDao.mapOffsetAndSize(offset, size, specializations);
 
         return namedJdbcTemplate.query(
                 "SELECT * FROM users WHERE userRole = 'CREATOR' AND " +
@@ -127,7 +117,7 @@ public class UserDao {
                 map, userMapper);
     }
 
-    public Optional<Invitation> getCreatorInvitationFromEvent(long creatorId, long eventId){
+    public Optional<Invitation> getCreatorInvitationFromEvent(long creatorId, long eventId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("creatorId", creatorId);
         map.addValue("eventId", eventId);
@@ -138,7 +128,7 @@ public class UserDao {
         ).stream().findAny();
     }
 
-    public Optional<Application> getEventApplicationToCreator(long eventId, long creatorId){
+    public Optional<Application> getEventApplicationToCreator(long eventId, long creatorId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("creatorId", creatorId);
         map.addValue("eventId", eventId);
@@ -149,7 +139,7 @@ public class UserDao {
                 applicationMapper).stream().findAny();
     }
 
-    public List<Invitation> getCreatorInvitations(long creatorId){
+    public List<Invitation> getCreatorInvitations(long creatorId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("creatorId", creatorId);
         return namedJdbcTemplate.query(
@@ -159,7 +149,7 @@ public class UserDao {
         );
     }
 
-    public Optional<Application> getCreatorEventApplication(long creatorId, long eventId){
+    public Optional<Application> getCreatorEventApplication(long creatorId, long eventId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("eventId", eventId);
         map.addValue("creatorId", creatorId);
@@ -170,7 +160,7 @@ public class UserDao {
         ).stream().findAny();
     }
 
-    public List<Application> getCreatorEventApplications(long creatorId){
+    public List<Application> getCreatorEventApplications(long creatorId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("creatorId", creatorId);
         return namedJdbcTemplate.query(
@@ -178,7 +168,7 @@ public class UserDao {
                 map, applicationMapper);
     }
 
-    public void sendEventApplication(long creatorId, long eventId, String message){
+    public void sendEventApplication(long creatorId, long eventId, String message) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("creatorId", creatorId);
         map.addValue("eventId", eventId);
@@ -189,7 +179,7 @@ public class UserDao {
                         " VALUES (:eventId, :creatorId, :message, :accepted)", map);
     }
 
-    public void inviteCreator(long creatorId, long organizerId, long eventId, String message){
+    public void inviteCreator(long creatorId, long organizerId, long eventId, String message) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("creatorId", creatorId);
         map.addValue("organizerId", organizerId);
@@ -200,7 +190,7 @@ public class UserDao {
                         " VALUES (:creatorId, :organizerId, :eventId, :message, NULL)", map);
     }
 
-    public void answerInvitation(long creatorId, long eventId, boolean accept){
+    public void answerInvitation(long creatorId, long eventId, boolean accept) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("creatorId", creatorId);
         map.addValue("eventId", eventId);
@@ -211,7 +201,7 @@ public class UserDao {
                 , map);
     }
 
-    public void answerApplication(long eventId, long creatorId, boolean accept){
+    public void answerApplication(long eventId, long creatorId, boolean accept) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("creatorId", creatorId);
         map.addValue("eventId", eventId);
@@ -222,7 +212,7 @@ public class UserDao {
                 map);
     }
 
-    public List<Long> getAllUserIds(){
+    public List<Long> getAllUserIds() {
         return namedJdbcTemplate.query("SELECT * FROM users",
                 new MapSqlParameterSource(),
                 (resultSet, i) -> resultSet.getLong("id")

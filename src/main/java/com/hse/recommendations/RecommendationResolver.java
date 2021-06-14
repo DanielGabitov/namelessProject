@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.google.common.primitives.Floats.min;
 import static com.google.common.primitives.Ints.min;
 
 @Component
@@ -39,7 +38,7 @@ public class RecommendationResolver {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class Pair implements Comparable<Pair>{
+    private static class Pair implements Comparable<Pair> {
         private Long id;
         private float coefficient;
 
@@ -52,7 +51,7 @@ public class RecommendationResolver {
     private static float getOverlapCoefficient(Set<Long> a, Set<Long> b) {
         Set<Long> intersection = new HashSet<>(a);
         intersection.retainAll(b);
-        if (a.isEmpty() || b.isEmpty()){
+        if (a.isEmpty() || b.isEmpty()) {
             return 0;
         }
         return ((float) intersection.size()) / (min(a.size(), b.size()));
@@ -75,7 +74,7 @@ public class RecommendationResolver {
     }
 
     private float calculateEventRecommendationCoefficient(Long eventId, List<Pair> userCluster,
-                                                          HashMap<Long, Set<Long>> usersToLikes){
+                                                          HashMap<Long, Set<Long>> usersToLikes) {
         float similaritySum = userCluster.stream()
                 .filter((Pair elem) -> usersToLikes.get(elem.id).contains(eventId))
                 .map(Pair::getCoefficient)
@@ -85,12 +84,12 @@ public class RecommendationResolver {
 
     private HashMap<Long, List<Pair>> helper(List<Long> eventIds,
                                              HashMap<Long, List<Pair>> clusters,
-                                             HashMap<Long, Set<Long>> usersToLikes){
+                                             HashMap<Long, Set<Long>> usersToLikes) {
 
         HashMap<Long, List<Pair>> result = new HashMap<>();
-        for (Long userId : clusters.keySet()){
+        for (Long userId : clusters.keySet()) {
             List<Pair> userRecommendations = new ArrayList<>();
-            for (Long eventId : eventIds){
+            for (Long eventId : eventIds) {
                 float eventCoefficient
                         = calculateEventRecommendationCoefficient(eventId, clusters.get(userId), usersToLikes);
                 userRecommendations.add(new Pair(eventId, eventCoefficient));
@@ -102,12 +101,12 @@ public class RecommendationResolver {
     }
 
     @Transactional
-    public void putDataToDataBase(HashMap<Long, List<Pair>> calculatedRecommendations){
+    public void putDataToDataBase(HashMap<Long, List<Pair>> calculatedRecommendations) {
         recommendationDao.clearRecommendations();
-        for (Long userId : calculatedRecommendations.keySet()){
+        for (Long userId : calculatedRecommendations.keySet()) {
             recommendationDao.markThatUserHasRecommendations(userId);
             calculatedRecommendations.get(userId).forEach((Pair elem) ->
-                            recommendationDao.addEventRecommendation(userId, elem.id, elem.coefficient));
+                    recommendationDao.addEventRecommendation(userId, elem.id, elem.coefficient));
         }
     }
 
@@ -119,7 +118,7 @@ public class RecommendationResolver {
         HashMap<Long, Set<Long>> usersToLikes = new HashMap<>();
         userIds.forEach(userId -> usersToLikes.put(userId, new HashSet<>(likesDao.getUserLikes(userId))));
         HashMap<Long, List<Pair>> clusters = calculateSimilarity(usersToLikes);
-        for (var elem : clusters.entrySet()){
+        for (var elem : clusters.entrySet()) {
             List<Pair> cluster = elem.getValue().stream().sorted().limit(clusterSize).collect(Collectors.toList());
             clusters.replace(elem.getKey(), cluster);
         }

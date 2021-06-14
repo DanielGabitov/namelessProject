@@ -9,15 +9,6 @@ services:
     ports:
       - 5432:5432
 
-  database-test:
-    image: postgres
-    container_name: postgres_test
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-HSE}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
-    ports:
-      - 5433:5432
-
   appimage:
     build: .
     ports:

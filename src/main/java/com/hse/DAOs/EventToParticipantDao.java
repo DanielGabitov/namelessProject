@@ -24,7 +24,7 @@ public class EventToParticipantDao {
 
         namedJdbcTemplate.update(
                 "INSERT INTO events_participants (eventId, participantId) VALUES (:eventId, :userId)",
-                    map);
+                map);
     }
 
     public void deleteParticipants(long eventId) {
@@ -51,14 +51,16 @@ public class EventToParticipantDao {
                 (resultSet, i) -> resultSet.getLong("eventId"));
     }
 
-    public boolean checkParticipation(long eventId, long participantId){
+    public Integer getNumberOfParticipationsInEventByParticipantId(long eventId, long participantId) {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("eventId", eventId);
         map.addValue("participantId", participantId);
 
-        return namedJdbcTemplate.query(
-                "SELECT * from events_participants WHERE eventid = :eventId AND participantid = :participantId",
-                    map, (resultSet, i) -> resultSet.getLong("eventId")
-        ).stream().findAny().isPresent();
+        return namedJdbcTemplate.queryForObject(
+                "SELECT count(eventid) FROM events_participants" +
+                        " WHERE eventid = :eventId AND participantid = :participantId",
+                map,
+                Integer.class
+        );
     }
 }

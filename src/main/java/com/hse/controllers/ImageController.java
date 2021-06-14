@@ -24,7 +24,7 @@ public class ImageController {
 
     @PostMapping(value = "", consumes = {"application/json"})
     @ApiOperation(value = "", nickname = "Save new image", tags = {"Image"})
-    public ResponseEntity<String> saveImages(@RequestBody ImageRegistrationData imageRegistrationData) {
+    public ResponseEntity<Void> saveImages(@RequestBody ImageRegistrationData imageRegistrationData) {
         imageService.saveImages(imageRegistrationData);
         return new ResponseEntity<>(HttpStatus.OK);
     }
