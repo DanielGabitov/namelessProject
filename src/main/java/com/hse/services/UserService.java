@@ -263,7 +263,7 @@ public class UserService implements UserDetailsService {
         return userDao.getCreatorInvitationFromEvent(creatorId, eventId).isPresent();
     }
 
-    public boolean checkIfCreatorHasApplicationFromEvent(long eventId, long creatorId) {
+    public boolean checkIfCreatorSentApplicationToEvent(long eventId, long creatorId) {
         return userDao.getEventApplicationToCreator(eventId, creatorId).isPresent();
     }
 

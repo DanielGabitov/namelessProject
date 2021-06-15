@@ -56,9 +56,9 @@ public class CreatorController {
 
     @GetMapping(value = "/{creatorId}/applications/{eventId}")
     @ApiOperation(value = "", nickname = "", tags = {"User"})
-    public ResponseEntity<Boolean> checkIfCreatorHasApplicationFromEvent(@PathVariable("creatorId") long creatorId,
-                                                                         @PathVariable("eventId") long eventId) {
-        return new ResponseEntity<>(userService.checkIfCreatorHasApplicationFromEvent(eventId, creatorId), HttpStatus.OK);
+    public ResponseEntity<Boolean> checkIfCreatorSentApplicationToEvent(@PathVariable("creatorId") long creatorId,
+                                                                        @PathVariable("eventId") long eventId) {
+        return new ResponseEntity<>(userService.checkIfCreatorSentApplicationToEvent(eventId, creatorId), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{creatorId}/invitations/futureEvents/{time}")
