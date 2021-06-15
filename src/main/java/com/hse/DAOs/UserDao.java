@@ -213,28 +213,6 @@ public class UserDao {
                 map);
     }
 
-    public void addViewedEvent(long userId, long eventId){
-        MapSqlParameterSource map = new MapSqlParameterSource();
-        map.addValue("userId", userId);
-        map.addValue("eventId", eventId);
-
-        namedJdbcTemplate.update(
-            "INSERT INTO user_viewed_events (userid, eventid) VALUES (:userId, :eventId)",
-                map
-        );
-    }
-
-    public List<Long> getUserViewedEvents(long userId){
-        MapSqlParameterSource map = new MapSqlParameterSource();
-        map.addValue("userId", userId);
-
-        return namedJdbcTemplate.query(
-                "SELECT eventid FROM user_viewed_events",
-                map,
-                (resultSet, i) -> resultSet.getLong("eventId")
-        );
-    }
-
     public List<Long> getAllUserIds() {
         return namedJdbcTemplate.query("SELECT * FROM users",
                 new MapSqlParameterSource(),

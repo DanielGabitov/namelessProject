@@ -124,6 +124,10 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
+    public void markThatUserViewedEvent(long userId, long eventId){
+        eventDao.addViewedEvent(userId, eventId);
+    }
+
     private Event mapRegistrationData(EventRegistrationData data) {
         Event event = new Event();
         event.setName(data.getName());

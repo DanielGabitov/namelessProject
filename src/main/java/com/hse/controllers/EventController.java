@@ -60,4 +60,12 @@ public class EventController {
                                                     @RequestParam("size") int size) {
         return new ResponseEntity<>(eventService.searchEvents(eventName, offset, size), HttpStatus.OK);
     }
+
+    @PostMapping(value = "{eventId}/views/{userId}")
+    @ApiOperation(value = "", nickname = "Search events.", tags = {"Events"})
+    public ResponseEntity<Void> markThatUserViewedEvent(@PathVariable("eventId") int eventId,
+                                                        @PathVariable("userId") int userId) {
+        eventService.markThatUserViewedEvent(userId, eventId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

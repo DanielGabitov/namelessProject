@@ -41,7 +41,7 @@ public class RecommendationResolver {
 
     private HashMap<Long, Double> calculateUserVector(Long userId) {
         var userVector = new HashMap<Long, Double>();
-        List<Long> viewedEvents = userDao.getUserViewedEvents(userId);
+        List<Long> viewedEvents = eventDao.getUserViewedEvents(userId);
         List<Long> likedEvents = likesDao.getUserLikes(userId);
         List<Long> participatedEvents = eventToParticipantDao.getUserParticipations(userId);
 
