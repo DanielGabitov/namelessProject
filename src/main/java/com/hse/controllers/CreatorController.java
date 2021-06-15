@@ -2,6 +2,7 @@ package com.hse.controllers;
 
 import com.hse.models.Event;
 import com.hse.models.Invitation;
+import com.hse.services.CreativeAssociationService;
 import com.hse.services.UserService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,12 @@ import java.util.List;
 public class CreatorController {
 
     private final UserService userService;
+    private final CreativeAssociationService associationService;
 
     @Autowired
-    public CreatorController(UserService userService) {
+    public CreatorController(UserService userService, CreativeAssociationService associationService) {
         this.userService = userService;
+        this.associationService = associationService;
     }
 
     @PostMapping(value = "/{creatorId}/applications/{eventId}")
@@ -87,5 +90,14 @@ public class CreatorController {
     public ResponseEntity<List<Event>> getCreatorPassedEventsApplications(@PathVariable("creatorId") long creatorId,
                                                                           @PathVariable("time") Timestamp time) {
         return new ResponseEntity<>(userService.getPassedEventsCreatorApplications(creatorId, time), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/{creatorId}/creatorAssociationInvites/{associationId}")
+    @ApiOperation(value = "", nickname = "", tags = {"User"})
+    public ResponseEntity<Void> answerCreatorAssociationInvitation(@PathVariable("associationId") long associationId,
+                                                                   @PathVariable("creatorId") long creatorId,
+                                                                   @RequestParam("acceptance") boolean acceptance) {
+        associationService.answerCreativeAssociationInvitation(associationId, creatorId, acceptance);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

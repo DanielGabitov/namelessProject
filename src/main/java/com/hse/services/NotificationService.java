@@ -44,6 +44,22 @@ public class NotificationService {
         notificationDao.addNotification(creatorId, eventId, notificationType);
     }
 
+    public void sendCreativeAssociationInvitationNotification(long associationBossCreatorId, long creatorId){
+        notificationDao.addNotification(creatorId, associationBossCreatorId, NotificationType.NEW_CREATIVE_ASSOCIATION_INVITATION);
+    }
+
+    public void sendCreativeAssociationInvitationAnswerNotification(long associationBossCreatorId,
+                                                                    long creatorId,
+                                                                    boolean accepted){
+        NotificationType notificationType;
+        if (accepted) {
+            notificationType = NotificationType.CREATIVE_ASSOCIATION_INVITATION_ANSWER_ACCEPTED;
+        } else {
+            notificationType = NotificationType.CREATIVE_ASSOCIATION_INVITATION_ANSWER_REJECTED;
+        }
+        notificationDao.addNotification(associationBossCreatorId, creatorId, notificationType);
+    }
+
     public List<Notification> getUserNotifications(long userId) {
         return notificationDao.getUserNotifications(userId);
     }
