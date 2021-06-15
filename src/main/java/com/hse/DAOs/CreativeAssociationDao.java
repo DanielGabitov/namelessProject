@@ -143,4 +143,15 @@ public class CreativeAssociationDao {
                         "WHERE creativeAssociationId = :associationId AND invitedCreatorId = :creatorId",
                 map);
     }
+
+    public List<CreativeAssociation> getCreativeAssociations(int size, int offset){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("offset", offset);
+        map.addValue("size", size);
+
+        return namedJdbcTemplate.query(
+                "SELECT * FROM creative_association OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY",
+                map,
+                associationMapper);
+    }
 }

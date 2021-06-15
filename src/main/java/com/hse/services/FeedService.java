@@ -4,6 +4,7 @@ import com.hse.DAOs.EventDao;
 import com.hse.DAOs.RecommendationDao;
 import com.hse.DAOs.UserDao;
 import com.hse.enums.Specialization;
+import com.hse.models.CreativeAssociation;
 import com.hse.models.Event;
 import com.hse.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +22,18 @@ public class FeedService {
     private final RecommendationDao recommendationDao;
     private final UserService userService;
     private final EventService eventService;
+    private final CreativeAssociationService creativeAssociationService;
 
     @Autowired
     public FeedService(EventDao eventDao, UserDao userDao, UserService userService,
-                       EventService eventService, RecommendationDao recommendationDao) {
+                       EventService eventService, RecommendationDao recommendationDao,
+                       CreativeAssociationService creativeAssociationService) {
         this.eventDao = eventDao;
         this.userDao = userDao;
         this.recommendationDao = recommendationDao;
         this.userService = userService;
         this.eventService = eventService;
+        this.creativeAssociationService = creativeAssociationService;
     }
 
     public List<Event> getEvents(int offset, int size, EnumSet<Specialization> specializations) {
@@ -71,5 +75,9 @@ public class FeedService {
         return creators.stream()
                 .map(userService::setUserDataFromOtherTables)
                 .collect(Collectors.toList());
+    }
+
+    public List<CreativeAssociation> getCreativeAssociations(int offset, int size){
+        return creativeAssociationService.getCreativeAssociations(size, offset);
     }
 }

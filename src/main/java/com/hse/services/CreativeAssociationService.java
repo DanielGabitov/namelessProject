@@ -126,4 +126,10 @@ public class CreativeAssociationService {
             associationDao.addMember(associationId, creatorId);
         }
     }
+
+    public List<CreativeAssociation> getCreativeAssociations(int size, int offset){
+        return associationDao.getCreativeAssociations(size, offset).stream()
+                .map(this::setAssociationDataFromOtherTables)
+                .collect(Collectors.toList());
+    }
 }
