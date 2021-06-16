@@ -11,3 +11,8 @@ DELETE FROM user_viewed_events;
 DELETE FROM notifications;
 DELETE FROM recommendations;
 DELETE FROM users_with_recommendations;
+DELETE FROM creative_association;
+DELETE FROM creative_association_images;
+DELETE FROM creative_association_members;
+DELETE FROM creative_association_invitations;
+DELETE FROM user_to_creator_or_organizer_rating;

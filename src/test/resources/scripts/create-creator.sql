@@ -1,2 +1,2 @@
 INSERT INTO users (id, userrole, firstname, lastname, patronymic, username, password, specialization, rating, description)
-VALUES (1, 'USER', 'name', 'name', 'name', 'username', 'password', 'ART', 1, 'description');
+VALUES (2, 'CREATOR', 'name', 'name', 'name', 'creator', 'password', 'ART', 1, 'description');

@@ -55,4 +55,18 @@ public class User implements UserDetails {
         return true;
     }
 
+    public void setEnabled(Boolean enabled) {
+    }
+
+    public void setAccountNonExpired(Boolean accountNonExpired) {
+    }
+
+    public void setAccountNonLocked(Boolean accountNonLocked) {
+    }
+
+    public void setCredentialsNonExpired(Boolean credentialsNonExpired) {
+    }
+
+    public void setAuthorities(Collection authorities) {
+    }
 }

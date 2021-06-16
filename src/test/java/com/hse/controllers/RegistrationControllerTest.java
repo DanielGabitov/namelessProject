@@ -23,7 +23,7 @@ public class RegistrationControllerTest extends AbstractIntegrationTest {
                 Specialization.ART, "description", new ArrayList<>());
 
         mockMvc.perform(
-                    post("/api/registration")
+                post("/api/registration")
                         .content(objectMapper.writeValueAsString(userRegistrationData))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
