@@ -67,8 +67,8 @@ public class UserDao {
 
         namedJdbcTemplate.update(
                 "INSERT INTO users (userRole, firstName, lastName, patronymic, username, password, specialization, " +
-                        "rating, description) VALUES " +
-                        "(:userRole, :firstName, :lastName, :patronymic, :userName, :password, :specialization, :rating," +
+                        "description) VALUES " +
+                        "(:userRole, :firstName, :lastName, :patronymic, :userName, :password, :specialization," +
                         " :description)", map, keyHolder
         );
         return (long) keyHolder.getKeyList().get(0).get("id");
@@ -80,7 +80,7 @@ public class UserDao {
         namedJdbcTemplate.update(
                 "UPDATE users SET userrole = :userRole, firstname = :firstName, lastname = :lastName, " +
                         "patronymic = :patronymic, username = :userName, password = :password, " +
-                        "specialization = :specialization, rating = :rating, description = :description " +
+                        "specialization = :specialization, description = :description " +
                         "WHERE username = :userName", map);
     }
 
@@ -93,7 +93,6 @@ public class UserDao {
         map.addValue("userName", newUser.getUsername());
         map.addValue("password", newUser.getPassword());
         map.addValue("specialization", newUser.getSpecialization().name());
-        map.addValue("rating", newUser.getRating());
         map.addValue("description", newUser.getDescription());
         return map;
     }
@@ -227,5 +226,31 @@ public class UserDao {
         map.addValue("size", size);
         return namedJdbcTemplate.query("SELECT * FROM users ORDER BY word_similarity(username, :username) DESC" +
                 " OFFSET :offset ROWS FETCH FIRST :size ROWS ONLY", map, userMapper);
+    }
+
+    public void rateCreatorOrOrganizer(long userId, long creatorOrOrganizerId, int rating){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("userId", userId);
+        map.addValue("creatorOrOrganizerId", creatorOrOrganizerId);
+        map.addValue("rating", rating);
+
+        namedJdbcTemplate.update(
+                "INSERT INTO user_to_creator_or_organizer_rating (userId, organizerOrCreatorid, rating)" +
+                        " VALUES (:userId, :creatorOrOrganizerId, :rating)",
+                map);
+    }
+
+    public double getCreatorOrOrganizerRatingForUser(long userId, long creatorOrOrganizerId){
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("userId", userId);
+        map.addValue("creatorOrOrganizerId", creatorOrOrganizerId);
+        var ratings = namedJdbcTemplate.query(
+                "SELECT rating FROM user_to_creator_or_organizer_rating " +
+                        "WHERE userId = :userId AND organizerOrCreatorid = :creatorOrOrganizerId",
+                map,
+                (resultSet, i) -> resultSet.getInt("rating")
+        );
+        long sum = ratings.stream().reduce(0, Integer::sum);
+        return ((double) sum) / ((double) ratings.size());
     }
 }

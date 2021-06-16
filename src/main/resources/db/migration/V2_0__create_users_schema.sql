@@ -10,6 +10,5 @@ CREATE TABLE users
     username       varchar(40) UNIQUE,
     password       varchar(40),
     specialization varchar(40),
-    rating         real,
     description    text
 );

@@ -276,12 +276,24 @@ public class UserService implements UserDetailsService {
         user.setUsername(data.getUsername());
         user.setPassword(data.getPassword());
         user.setSpecialization(data.getSpecialization());
-        user.setRating(1);
         user.setDescription(data.getDescription());
 
         user.setImages(List.of());
 
         return user;
+    }
+
+    public List<User> getEventCreators(long eventId){
+        return eventService.getEventCreatorsIds(eventId).stream()
+                .map(this::loadUserById)
+                .collect(Collectors.toList());
+    }
+
+    public void rateEvent(long userId, long eventId, int rating) {
+        List<Long> creatorIds = eventService.getEventCreatorsIds(eventId);
+        Long organizerId = eventService.getEventOrganizer(eventId);
+        userDao.rateCreatorOrOrganizer(userId, organizerId, rating);
+        creatorIds.forEach(creatorId -> userDao.rateCreatorOrOrganizer(userId, creatorId, rating));
     }
 
     public List<User> searchUsers(String username, int offset, int size) {

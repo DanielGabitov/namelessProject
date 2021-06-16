@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @RestController
@@ -53,6 +54,12 @@ public class EventController {
         return new ResponseEntity<>(userService.getParticipants(eventId), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/{eventId}/creators", produces = {"application/json"})
+    @ApiOperation(value = "", nickname = "Get creators that will be at the event", tags = {"Events"})
+    public ResponseEntity<List<User>> getEventCreators(@PathVariable("eventId") long eventId){
+        return new ResponseEntity<>(userService.getEventCreators(eventId), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/search", produces = {"application/json"})
     @ApiOperation(value = "", nickname = "Search events.", tags = {"Events"})
     public ResponseEntity<List<Event>> searchEvents(@RequestParam("eventName") String eventName,
@@ -61,11 +68,18 @@ public class EventController {
         return new ResponseEntity<>(eventService.searchEvents(eventName, offset, size), HttpStatus.OK);
     }
 
-    @PostMapping(value = "{eventId}/views/{userId}")
+    @PostMapping(value = "/{eventId}/views/{userId}")
     @ApiOperation(value = "", nickname = "Search events.", tags = {"Events"})
     public ResponseEntity<Void> markThatUserViewedEvent(@PathVariable("eventId") int eventId,
                                                         @PathVariable("userId") int userId) {
         eventService.markThatUserViewedEvent(userId, eventId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/updatePastEvents", consumes = {"application/json"})
+    @ApiOperation(value = "", nickname = "Update pastEvents", tags = {"Events"})
+    public ResponseEntity<Void> updatePastEvents(@RequestBody Timestamp date){
+        eventService.updatePastEvents(date);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

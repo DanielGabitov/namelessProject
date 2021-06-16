@@ -60,6 +60,10 @@ public class NotificationService {
         notificationDao.addNotification(associationBossCreatorId, creatorId, notificationType);
     }
 
+    public void sendNotificationToRatePassedEvent(long passedEventId, long userId){
+        notificationDao.addNotification(userId, passedEventId, NotificationType.RATE_PASSED_EVENT);
+    }
+
     public List<Notification> getUserNotifications(long userId) {
         return notificationDao.getUserNotifications(userId);
     }

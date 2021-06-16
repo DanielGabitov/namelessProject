@@ -135,4 +135,13 @@ public class UserController {
                                                   @RequestParam("size") int size) {
         return new ResponseEntity<>(userService.searchUsers(username, offset, size), HttpStatus.OK);
     }
+
+    @PostMapping(value = "/{userId}/events/{eventId}/rating")
+    @ApiOperation(value = "", nickname = "Rate passed event.", tags = {"User"})
+    public ResponseEntity<Void> rateEvent(@PathVariable("userId") long userId,
+                                          @PathVariable("eventId") long eventId,
+                                          @RequestParam("score") int score) {
+        userService.rateEvent(userId, eventId, score);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

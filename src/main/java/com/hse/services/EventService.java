@@ -26,14 +26,18 @@ public class EventService {
     private final EventToImagesDao eventToImagesDao;
     private final LikesDao likesDao;
 
+    private final NotificationService notificationService;
+
     @Autowired
     public EventService(EventDao eventDao, EventToParticipantDao eventToParticipantDao,
-                        EventToImagesDao eventToImagesDao, LikesDao likesDao) {
+                        EventToImagesDao eventToImagesDao, LikesDao likesDao, NotificationService notificationService) {
 
         this.eventDao = eventDao;
         this.eventToParticipantDao = eventToParticipantDao;
         this.eventToImagesDao = eventToImagesDao;
         this.likesDao = likesDao;
+
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -147,5 +151,24 @@ public class EventService {
         return eventDao.searchEvents(eventName, offset, size).stream()
                 .map(this::setEventDataFromOtherTables)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updatePastEvents(Timestamp date){
+        List<Long> passedEvents = eventDao.getRecentlyPassedEvents(date);
+        if (passedEvents.isEmpty()){
+            return;
+        }
+        eventDao.markEventsThatTheyHavePassed(passedEvents);
+        for (Long eventId : passedEvents){
+            List<Long> eventParticipants = getParticipantsIds(eventId);
+            eventParticipants.forEach(
+                    participantId -> notificationService.sendNotificationToRatePassedEvent(eventId, participantId)
+            );
+        }
+    }
+
+    public List<Long> getEventCreatorsIds(long eventId){
+        return eventDao.getEventCreatorIds(eventId);
     }
 }

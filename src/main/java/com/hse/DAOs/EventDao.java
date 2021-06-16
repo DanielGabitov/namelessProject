@@ -61,8 +61,8 @@ public class EventDao {
 
         namedJdbcTemplate.update(
                 "INSERT INTO events" +
-                        "(name, description, organizerid, geoData, specialization, date)" +
-                        " VALUES (:name, :description, :organizerId, :geoData, :specialization, :date)",
+                        "(name, description, organizerid, geodata, specialization, date, passed)" +
+                        " VALUES (:name, :description, :organizerId, :geoData, :specialization, :date, FALSE)",
                 map, keyHolder
         );
         return (long) keyHolder.getKeyList().get(0).get("id");
@@ -277,5 +277,40 @@ public class EventDao {
                 map,
                 (resultSet, i) -> resultSet.getLong("eventId")
         );
+    }
+
+    public List<Long> getRecentlyPassedEvents(Timestamp dateNow) {
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("dateNow", dateNow);
+
+        return namedJdbcTemplate.query(
+                "SELECT id FROM events WHERE passed = FALSE AND date < :dateNow",
+                map,
+                (resultSet, i) -> resultSet.getLong("id"));
+    }
+
+    public void markEventsThatTheyHavePassed(List<Long> passedEventIds) {
+        var map = new MapSqlParameterSource();
+        map.addValue("eventsIds", passedEventIds);
+        namedJdbcTemplate.update(
+                "UPDATE events SET passed = TRUE WHERE id IN (:eventsIds)",
+                map);
+    }
+
+    public List<Long> getEventCreatorIds(long eventId) {
+        var map = new MapSqlParameterSource();
+        map.addValue("eventId", eventId);
+        var result = namedJdbcTemplate.query(
+                    "SELECT creatorId FROM event_applications WHERE eventId = :eventId AND accepted = TRUE",
+                    map,
+                    (resultSet, i) -> resultSet.getLong("creatorId"));
+        result.addAll(
+                namedJdbcTemplate.query(
+                        "SELECT creatorId FROM creators_invites WHERE eventId = :eventId AND accepted = TRUE",
+                        map,
+                        (resultSet, i) -> resultSet.getLong("creatorId")
+                )
+        );
+        return result;
     }
 }
