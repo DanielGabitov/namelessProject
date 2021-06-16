@@ -208,7 +208,7 @@ public class EventDao {
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("eventId", eventId);
         return namedJdbcTemplate.query(
-                "SELECT * from creators_invites WHERE eventid = :eventId",
+                "SELECT * from event_applications WHERE eventid = :eventId",
                 map, applicationMapper);
     }
 
