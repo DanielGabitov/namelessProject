@@ -17,7 +17,6 @@ public class EventMapper implements RowMapper<Event> {
         event.setName(resultSet.getString("name"));
         event.setDescription(resultSet.getString("description"));
         event.setOrganizerId(resultSet.getLong("organizerId"));
-        event.setRating(resultSet.getFloat("rating"));
         event.setGeoData(resultSet.getString("geoData"));
         event.setSpecialization(Specialization.valueOf(resultSet.getString("specialization")));
         event.setDate(resultSet.getTimestamp("date"));

@@ -4,7 +4,6 @@ CREATE TABLE events
     name            varchar(40),
     description     text,
     organizerId     bigint,
-    rating          real,
     geoData         varchar(100),
     specialization  varchar(40),
     date            timestamp

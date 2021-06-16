@@ -19,7 +19,6 @@ public class Event {
     private List<String> images;
     private Long organizerId;
     private List<Long> participantsIDs;
-    private float rating;
     private String geoData;
     private Specialization specialization;
     private Timestamp date;

@@ -61,8 +61,8 @@ public class EventDao {
 
         namedJdbcTemplate.update(
                 "INSERT INTO events" +
-                        "(name, description, organizerid, rating, geoData, specialization, date)" +
-                        " VALUES (:name, :description, :organizerId, :rating, :geoData, :specialization, :date)",
+                        "(name, description, organizerid, geoData, specialization, date)" +
+                        " VALUES (:name, :description, :organizerId, :geoData, :specialization, :date)",
                 map, keyHolder
         );
         return (long) keyHolder.getKeyList().get(0).get("id");
@@ -72,7 +72,6 @@ public class EventDao {
         map.addValue("name", event.getName());
         map.addValue("description", event.getDescription());
         map.addValue("organizerId", event.getOrganizerId());
-        map.addValue("rating", event.getRating());
         map.addValue("geoData", event.getGeoData());
         map.addValue("specialization", event.getSpecialization().name());
         map.addValue("date", event.getDate());
@@ -87,7 +86,7 @@ public class EventDao {
 
         namedJdbcTemplate.update(
                 "UPDATE events SET name = :name, description = :description, organizerid = :organizerId, " +
-                        "rating = :rating, geodata = :geoData, specialization = :specialization, date = :date " +
+                        "geodata = :geoData, specialization = :specialization, date = :date " +
                         "WHERE id = :id", map);
     }
 

@@ -132,7 +132,6 @@ public class EventService {
         Event event = new Event();
         event.setName(data.getName());
         event.setDescription(data.getDescription());
-        event.setRating(data.getRating());
         event.setGeoData(data.getGeoData());
         event.setSpecialization(data.getSpecialization());
         event.setDate(data.getDate());

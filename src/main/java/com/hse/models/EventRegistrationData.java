@@ -16,7 +16,6 @@ public class EventRegistrationData {
     private String name;
     private String description;
     private long organizerId;
-    private float rating;
     private String geoData;
     private Specialization specialization;
     private Timestamp date;
@@ -26,7 +25,6 @@ public class EventRegistrationData {
 //    {
 //            "name"            : "name",
 //            "description"     : "description",
-//            "rating"          : 0.4,
 //            "geoData"         : "geoData",
 //            "specialization"  : "LITERATURE",
 //            "date"            : "2020-04-04",
