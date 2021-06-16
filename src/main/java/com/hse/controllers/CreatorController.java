@@ -1,5 +1,6 @@
 package com.hse.controllers;
 
+import com.hse.models.Application;
 import com.hse.models.Event;
 import com.hse.models.Invitation;
 import com.hse.services.CreativeAssociationService;
@@ -90,6 +91,18 @@ public class CreatorController {
     public ResponseEntity<List<Event>> getCreatorPassedEventsApplications(@PathVariable("creatorId") long creatorId,
                                                                           @PathVariable("time") Timestamp time) {
         return new ResponseEntity<>(userService.getPassedEventsCreatorApplications(creatorId, time), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{creatorId}/applications/{eventId}")
+    public ResponseEntity<Application> getApplication(@PathVariable("creatorId") long creatorId,
+                                                      @PathVariable("eventId") long eventId) {
+        return new ResponseEntity<>(userService.getApplication(creatorId, eventId), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{creatorId}/invitations/{eventId}")
+    public ResponseEntity<Invitation> getInvitation(@PathVariable("creatorId") long creatorId,
+                                                    @PathVariable("eventId") long eventId) {
+        return new ResponseEntity<>(userService.getInvitation(creatorId, eventId), HttpStatus.OK);
     }
 
     @PostMapping(value = "/{creatorId}/creatorAssociationInvites/{associationId}")

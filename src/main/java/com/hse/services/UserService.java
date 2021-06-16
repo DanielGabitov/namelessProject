@@ -301,4 +301,26 @@ public class UserService implements UserDetailsService {
                 .map(this::setUserDataFromOtherTables)
                 .collect(Collectors.toList());
     }
+
+    public Application getApplication(long creatorId, long eventId){
+        var optionalApplication = userDao.getCreatorEventApplication(creatorId, eventId);
+        if (optionalApplication.isEmpty()){
+            throw new ServiceException(
+                    HttpStatus.BAD_REQUEST,
+                    "Creator " + creatorId + " has not sent application to event " + eventId
+            );
+        }
+        return optionalApplication.get();
+    }
+
+    public Invitation getInvitation(long creatorId, long eventId){
+        var optionalInvitation = userDao.getCreatorInvitationFromEvent(creatorId, eventId);
+        if (optionalInvitation.isEmpty()){
+            throw new ServiceException(
+                    HttpStatus.BAD_REQUEST,
+                    "Creator " + creatorId + " has not sent application to event " + eventId
+            );
+        }
+        return optionalInvitation.get();
+    }
 }
