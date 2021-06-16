@@ -1,14 +1,16 @@
 CREATE TABLE events
 (
-    id              bigserial not null primary key,
-    name            varchar(40),
-    description     text,
-    organizerId     bigint,
-    rating          real,
-    geoData         varchar(100),
-    specialization  varchar(40),
-    date            timestamp
+    id             bigserial not null primary key,
+    name           varchar(40),
+    description    text,
+    organizerId    bigint,
+    geoData        varchar(100),
+    specialization varchar(40),
+    date           timestamp,
+    passed         bool
 );
+
+CREATE EXTENSION pg_trgm;
 
 CREATE TABLE users
 (
@@ -77,7 +79,7 @@ CREATE TABLE event_applications
 
 CREATE TABLE user_viewed_events
 (
-    userId bigint NOT NULL,
+    userId  bigint NOT NULL,
     eventId bigint NOT NULL,
     PRIMARY KEY (userId, eventId)
 );
@@ -92,9 +94,9 @@ CREATE TABLE notifications
 
 CREATE TABLE recommendations
 (
-    userId bigint NOT NULL,
-    eventId bigint NOT NULL,
-    coefficient float NOT NULL,
+    userId      bigint NOT NULL,
+    eventId     bigint NOT NULL,
+    coefficient float  NOT NULL,
     PRIMARY KEY (userId, eventId)
 );
 
@@ -120,15 +122,22 @@ CREATE TABLE creative_association_images
 CREATE TABLE creative_association_members
 (
     creativeAssociationId bigint NOT NULL,
-    memberId bigint NOT NULL,
+    memberId              bigint NOT NULL,
     PRIMARY KEY (creativeAssociationId, memberId)
 );
 
 CREATE TABLE creative_association_invitations
 (
     creativeAssociationId bigint NOT NULL,
-    invitedCreatorId bigint NOT NULL,
-    isAnswered boolean,
-    acceptance boolean,
+    invitedCreatorId      bigint NOT NULL,
+    isAnswered            boolean,
+    acceptance            boolean,
     PRIMARY KEY (creativeAssociationId, invitedCreatorId)
+);
+
+CREATE TABLE user_to_creator_or_organizer_rating
+(
+    userId               bigint,
+    organizerOrCreatorId bigint,
+    rating               smallint
 );

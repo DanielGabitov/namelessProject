@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class SubscriptionControllerTest extends AbstractIntegrationTest {
 
     @Test
-    @Sql(value = {"/scripts/before-test.sql", "/scripts/create-user.sql", "/scripts/create-user1.sql"},
+    @Sql(value = {"/scripts/before-test.sql", "/scripts/create-user.sql", "/scripts/create-creator.sql"},
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testAddSubscription() throws Exception {
         String token = getToken("username", "password");
@@ -30,7 +30,7 @@ public class SubscriptionControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Sql(value = {"/scripts/before-test.sql", "/scripts/create-user.sql", "/scripts/create-user1.sql"},
+    @Sql(value = {"/scripts/before-test.sql", "/scripts/create-user.sql", "/scripts/create-creator.sql"},
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testDeleteSubscription() throws Exception {
         testAddSubscription();
@@ -49,7 +49,7 @@ public class SubscriptionControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Sql(value = {"/scripts/before-test.sql", "/scripts/create-user.sql", "/scripts/create-user1.sql"},
+    @Sql(value = {"/scripts/before-test.sql", "/scripts/create-user.sql", "/scripts/create-creator.sql"},
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testGetAllSubscriptions() throws Exception {
         testAddSubscription();
