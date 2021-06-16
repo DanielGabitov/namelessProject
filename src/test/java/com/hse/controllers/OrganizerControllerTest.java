@@ -56,9 +56,16 @@ public class OrganizerControllerTest extends AbstractIntegrationTest {
     @Sql(value = {"/scripts/before-test.sql", "/scripts/create-creator.sql", "/scripts/create-event.sql",
             "/scripts/create-organizer.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testGetOrganizerApplications() throws Exception {
-        testInviteCreator();
+        String token = getToken("creator", "password");
 
-        String token = getToken("organizer", "password");
+        mockMvc.perform(
+                post("/api/creators/{creatorId}/applications/{eventId}", 2, 1)
+                        .content("application")
+                        .header(HttpHeaders.AUTHORIZATION, token))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        token = getToken("organizer", "password");
         MvcResult mvcResult = mockMvc.perform(
                 get("/api/organizers/3/applications")
                         .param("acceptance", "false")

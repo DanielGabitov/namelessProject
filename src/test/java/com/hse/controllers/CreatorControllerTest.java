@@ -37,7 +37,7 @@ public class CreatorControllerTest extends AbstractIntegrationTest {
         String token = getToken("creator", "password");
 
         MvcResult mvcResult = mockMvc.perform(
-                get("/api/creators/2/applications/1")
+                get("/api/creators/2/applications/1/check")
                         .content("application")
                         .header(HttpHeaders.AUTHORIZATION, token))
                 .andExpect(status().isOk())
@@ -49,7 +49,7 @@ public class CreatorControllerTest extends AbstractIntegrationTest {
         testSendApplication();
 
         mvcResult = mockMvc.perform(
-                get("/api/creators/2/applications/1")
+                get("/api/creators/2/applications/1/check")
                         .content("application")
                         .header(HttpHeaders.AUTHORIZATION, token))
                 .andExpect(status().isOk())
@@ -129,7 +129,7 @@ public class CreatorControllerTest extends AbstractIntegrationTest {
         String token = getToken("creator", "password");
 
         MvcResult mvcResult = mockMvc.perform(
-                get("/api/creators/2/invitations/1")
+                get("/api/creators/2/invitations/1/check")
                         .header(HttpHeaders.AUTHORIZATION, token))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -150,7 +150,7 @@ public class CreatorControllerTest extends AbstractIntegrationTest {
         token = getToken("creator", "password");
 
         mvcResult = mockMvc.perform(
-                get("/api/creators/2/invitations/1")
+                get("/api/creators/2/invitations/1/check")
                         .header(HttpHeaders.AUTHORIZATION, token))
                 .andExpect(status().isOk())
                 .andReturn();
