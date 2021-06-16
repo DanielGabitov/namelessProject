@@ -51,14 +51,14 @@ public class CreatorController {
         return new ResponseEntity<>(userService.getCreatorInvitations(creatorId), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{creatorId}/invitations/{eventId}")
+    @GetMapping(value = "/{creatorId}/invitations/{eventId}/check")
     @ApiOperation(value = "", nickname = "", tags = {"User"})
     public ResponseEntity<Boolean> checkIfCreatorHasInvitationToEvent(@PathVariable("creatorId") long creatorId,
                                                                       @PathVariable("eventId") long eventId) {
         return new ResponseEntity<>(userService.checkIfCreatorHasInvitationToEvent(creatorId, eventId), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{creatorId}/applications/{eventId}")
+    @GetMapping(value = "/{creatorId}/applications/{eventId}/check")
     @ApiOperation(value = "", nickname = "", tags = {"User"})
     public ResponseEntity<Boolean> checkIfCreatorSentApplicationToEvent(@PathVariable("creatorId") long creatorId,
                                                                         @PathVariable("eventId") long eventId) {
