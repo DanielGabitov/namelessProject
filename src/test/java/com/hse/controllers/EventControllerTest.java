@@ -24,7 +24,7 @@ public class EventControllerTest extends AbstractIntegrationTest {
         String token = getToken("username", "password");
 
         EventRegistrationData eventRegistrationData = new EventRegistrationData("name", "desc",
-                1, 1, "geo", Specialization.ART, new Timestamp(1), new ArrayList<>());
+                1, "geo", Specialization.ART, new Timestamp(1), new ArrayList<>());
 
         mockMvc.perform(
                 post("/api/events")
@@ -41,7 +41,7 @@ public class EventControllerTest extends AbstractIntegrationTest {
         String token = getToken("username", "password");
 
         Event event = new Event(1L, "name", "desc", new ArrayList<>(), 1L, new ArrayList<>(),
-                1, "geo", Specialization.ART, new Timestamp(1), new ArrayList<>());
+                "geo", Specialization.ART, new Timestamp(1), new ArrayList<>());
 
         mockMvc.perform(
                 put("/api/events/1")
