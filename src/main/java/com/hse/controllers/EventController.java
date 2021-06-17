@@ -1,5 +1,6 @@
 package com.hse.controllers;
 
+import com.hse.models.Application;
 import com.hse.models.Event;
 import com.hse.models.EventRegistrationData;
 import com.hse.models.User;
@@ -81,5 +82,10 @@ public class EventController {
     public ResponseEntity<Void> updatePastEvents(@RequestBody Timestamp date){
         eventService.updatePastEvents(date);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{eventId}/applications")
+    public ResponseEntity<List<Application>> getEventApplications(@PathVariable("eventId") long eventId){
+        return new ResponseEntity<>(eventService.getEventApplications(eventId), HttpStatus.OK);
     }
 }

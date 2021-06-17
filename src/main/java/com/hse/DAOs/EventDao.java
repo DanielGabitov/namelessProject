@@ -209,7 +209,8 @@ public class EventDao {
         map.addValue("eventId", eventId);
         return namedJdbcTemplate.query(
                 "SELECT * from event_applications WHERE eventid = :eventId",
-                map, applicationMapper);
+                map,
+                applicationMapper);
     }
 
     public void addParticipant(long eventId, long participantId) {
