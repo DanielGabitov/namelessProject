@@ -6,6 +6,6 @@
 docker compose build
 docker compose up -d
 ```
-* Ресурсы по адрессу: http://localhost:8080/api/*
+* Сервер по адрессу: https://deadpoets.ru/api/*
 # Frontend лежит [здесь](https://github.com/MIXOZ/HSE_Slaves)
  
